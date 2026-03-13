@@ -2,7 +2,7 @@ import {
   LayoutDashboard, Home, Activity, MapPin, ArrowLeftRight,
   FileText, BookOpen, Map, Users, UserCheck, Handshake,
   ClipboardList, CalendarDays, Car, Megaphone, BarChart3,
-  Globe, Search, Mail, MonitorSmartphone, Settings, StickyNote,
+  Globe, Search, Mail, Monitor, Settings, StickyNote,
   Bell, Moon, LogOut,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
