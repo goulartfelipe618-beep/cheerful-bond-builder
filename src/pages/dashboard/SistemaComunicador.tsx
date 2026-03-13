@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { RefreshCw, QrCode } from "lucide-react";
+import { RefreshCw, Smartphone } from "lucide-react";
 
 export default function SistemaComunicadorPage() {
   return (
