@@ -17,7 +17,7 @@ export default function GruposSolicitacoesPage() {
 
       <div className="rounded-xl border border-border bg-card p-6">
         <h3 className="font-semibold text-foreground mb-3">Solicitações Recebidas</h3>
-        <p className="text-sm text-muted-foreground">Carregando...</p>
+        <p className="text-sm text-muted-foreground">Nenhuma solicitação recebida.</p>
       </div>
     </div>
   );

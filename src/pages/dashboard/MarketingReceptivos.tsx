@@ -21,7 +21,7 @@ export default function MarketingReceptivosPage() {
 
       <div className="rounded-xl border border-border bg-card p-6">
         <h3 className="font-semibold text-foreground mb-3">Todos os Receptivos</h3>
-        <p className="text-sm text-muted-foreground">Carregando...</p>
+        <p className="text-sm text-muted-foreground">Nenhum receptivo encontrado.</p>
       </div>
     </div>
   );

@@ -26,7 +26,7 @@ export default function TransferGeolocalizacaoPage() {
 
       <div className="rounded-xl border border-border bg-card p-6">
         <h3 className="font-semibold text-foreground mb-3">Links de Rastreamento</h3>
-        <p className="text-sm text-muted-foreground">Carregando...</p>
+        <p className="text-sm text-muted-foreground">Nenhum link de rastreamento criado.</p>
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
