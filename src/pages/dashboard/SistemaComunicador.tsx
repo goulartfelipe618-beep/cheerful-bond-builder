@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { RefreshCw, QrCode } from "lucide-react";
+import { RefreshCw, Smartphone } from "lucide-react";
 
 export default function SistemaComunicadorPage() {
   return (
@@ -16,7 +16,7 @@ export default function SistemaComunicadorPage() {
 
       <div className="rounded-xl border border-border bg-card p-6">
         <div className="flex items-center gap-2 mb-2">
-          <QrCode className="h-5 w-5 text-foreground" />
+          <Smartphone className="h-5 w-5 text-foreground" />
           <h3 className="font-semibold text-foreground">Conectar WhatsApp</h3>
         </div>
         <p className="text-sm text-muted-foreground mb-6">
@@ -25,11 +25,11 @@ export default function SistemaComunicadorPage() {
 
         <div className="flex flex-col items-center gap-4 py-8">
           <div className="w-32 h-32 border-2 border-dashed border-border rounded-lg flex items-center justify-center">
-            <QrCode className="h-16 w-16 text-muted-foreground" />
+            <Smartphone className="h-16 w-16 text-muted-foreground" />
           </div>
           <p className="text-sm text-muted-foreground">Clique abaixo para gerar o QR Code da Evolution API</p>
           <Button className="bg-primary text-primary-foreground">
-            <QrCode className="h-4 w-4 mr-2" /> Gerar QR Code
+            <Smartphone className="h-4 w-4 mr-2" /> Gerar QR Code
           </Button>
         </div>
       </div>
