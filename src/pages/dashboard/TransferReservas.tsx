@@ -7,6 +7,7 @@ import CriarReservaTransferDialog from "@/components/transfer/CriarReservaTransf
 import DetalhesReservaTransferSheet from "@/components/reservas/DetalhesReservaTransferSheet";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { generateTransferPDF } from "@/lib/pdfGenerator";
 
 interface Reserva {
   id: string;
