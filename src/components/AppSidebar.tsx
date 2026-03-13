@@ -2,7 +2,7 @@ import {
   LayoutDashboard, Home, Activity, MapPin, ArrowLeftRight,
   FileText, BookOpen, Map, Users, UserCheck, Handshake,
   ClipboardList, CalendarDays, Car, Megaphone, BarChart3,
-  Globe, Search, Mail, MonitorSmartphone, Settings, StickyNote,
+  Globe, Search, Mail, Monitor, Settings, StickyNote,
   Bell, Moon, LogOut,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
@@ -81,7 +81,7 @@ const menuStructure = [
       { title: "Network", url: "/dashboard/network", icon: Globe },
       { title: "Google", url: "/dashboard/google", icon: Search },
       { title: "E-mail Business", url: "/dashboard/email-business", icon: Mail },
-      { title: "Website", url: "/dashboard/website", icon: MonitorSmartphone },
+      { title: "Website", url: "/dashboard/website", icon: Monitor },
     ],
   },
   {
