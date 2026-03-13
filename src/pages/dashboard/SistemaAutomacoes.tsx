@@ -330,6 +330,12 @@ export default function SistemaAutomacoesPage() {
             )}
           </div>
         </div>
+        <FerramentasDevDialog
+          open={devToolsOpen}
+          onOpenChange={setDevToolsOpen}
+          tipo={selected.tipo}
+          onSubmit={handleTestSubmit}
+        />
       </div>
     );
   }
