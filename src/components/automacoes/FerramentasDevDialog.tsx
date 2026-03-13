@@ -1,15 +1,11 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
 } from "@/components/ui/dialog";
-import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from "@/components/ui/select";
-import { ArrowLeft, ArrowRight, Code2, Send } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Code2, Copy, FileText } from "lucide-react";
+import { toast } from "sonner";
 
 interface FerramentasDevDialogProps {
   open: boolean;
@@ -18,252 +14,241 @@ interface FerramentasDevDialogProps {
   onSubmit: (payload: Record<string, string>) => void;
 }
 
-// Step definitions per type
-const transferStep1Fields = [
-  { key: "tipo_viagem", label: "Tipo de Viagem", type: "select", options: ["Somente Ida", "Ida e Volta", "Por Hora"] },
+interface FieldDoc {
+  variable: string;
+  label: string;
+  type: string;
+  required?: boolean;
+  options?: string[];
+}
+
+const personalFields: FieldDoc[] = [
+  { variable: "nome_completo", label: "Nome Completo", type: "text", required: true },
+  { variable: "telefone", label: "Número de Telefone", type: "text", required: true },
+  { variable: "email", label: "E-mail", type: "email", required: true },
+  { variable: "como_encontrou", label: "Por onde nos encontrou?", type: "select", options: ["Google", "Instagram", "Facebook", "Indicação", "Outro"] },
 ];
 
-const transferIdaFields = [
-  { key: "passageiros_ida", label: "Passageiros (Ida)", type: "text" },
-  { key: "embarque_ida", label: "Embarque (Ida)", type: "text" },
-  { key: "destino_ida", label: "Destino (Ida)", type: "text" },
-  { key: "data_ida", label: "Data (Ida)", type: "date" },
-  { key: "hora_ida", label: "Hora (Ida)", type: "time" },
-  { key: "mensagem_ida", label: "Mensagem (Ida)", type: "textarea" },
-  { key: "cupom_ida", label: "Cupom (Ida)", type: "text" },
+const transferIdaDocs: FieldDoc[] = [
+  { variable: "tipo_viagem", label: "Tipo de Viagem", type: "select", required: true, options: ["Somente Ida", "Ida e Volta", "Por Hora"] },
+  { variable: "passageiros_ida", label: "Passageiros (Ida)", type: "number", required: true },
+  { variable: "embarque_ida", label: "Embarque (Ida)", type: "text", required: true },
+  { variable: "destino_ida", label: "Destino (Ida)", type: "text", required: true },
+  { variable: "data_ida", label: "Data (Ida)", type: "date", required: true },
+  { variable: "hora_ida", label: "Hora (Ida)", type: "time", required: true },
+  { variable: "mensagem_ida", label: "Mensagem (Ida)", type: "textarea" },
+  { variable: "cupom_ida", label: "Cupom (Ida)", type: "text" },
 ];
 
-const transferVoltaFields = [
-  { key: "passageiros_volta", label: "Passageiros (Volta)", type: "text" },
-  { key: "embarque_volta", label: "Embarque (Volta)", type: "text" },
-  { key: "destino_volta", label: "Destino (Volta)", type: "text" },
-  { key: "data_volta", label: "Data (Volta)", type: "date" },
-  { key: "hora_volta", label: "Hora (Volta)", type: "time" },
-  { key: "mensagem_volta", label: "Mensagem (Volta)", type: "textarea" },
-  { key: "cupom_volta", label: "Cupom (Volta)", type: "text" },
+const transferVoltaDocs: FieldDoc[] = [
+  { variable: "passageiros_volta", label: "Passageiros (Volta)", type: "number", required: true },
+  { variable: "embarque_volta", label: "Embarque (Volta)", type: "text", required: true },
+  { variable: "destino_volta", label: "Destino (Volta)", type: "text", required: true },
+  { variable: "data_volta", label: "Data (Volta)", type: "date", required: true },
+  { variable: "hora_volta", label: "Hora (Volta)", type: "time", required: true },
+  { variable: "mensagem_volta", label: "Mensagem (Volta)", type: "textarea" },
+  { variable: "cupom_volta", label: "Cupom (Volta)", type: "text" },
 ];
 
-const transferPorHoraFields = [
-  { key: "passageiros", label: "Passageiros", type: "text" },
-  { key: "endereco_inicio", label: "Endereço de Início", type: "text" },
-  { key: "data", label: "Data", type: "date" },
-  { key: "hora", label: "Hora", type: "time" },
-  { key: "qtd_horas", label: "Qtd. Horas", type: "text" },
-  { key: "ponto_encerramento", label: "Ponto de Encerramento", type: "text" },
-  { key: "itinerario_mensagem", label: "Itinerário / Mensagem", type: "textarea" },
-  { key: "cupom", label: "Cupom", type: "text" },
+const transferPorHoraDocs: FieldDoc[] = [
+  { variable: "tipo_viagem", label: "Tipo de Viagem", type: "select", required: true, options: ["Somente Ida", "Ida e Volta", "Por Hora"] },
+  { variable: "passageiros", label: "Passageiros", type: "number", required: true },
+  { variable: "endereco_inicio", label: "Endereço de Início", type: "text", required: true },
+  { variable: "data", label: "Data", type: "date", required: true },
+  { variable: "hora", label: "Hora", type: "time", required: true },
+  { variable: "qtd_horas", label: "Qtd. Horas", type: "number", required: true },
+  { variable: "ponto_encerramento", label: "Ponto de Encerramento", type: "text" },
+  { variable: "itinerario_mensagem", label: "Itinerário / Mensagem", type: "textarea" },
+  { variable: "cupom", label: "Cupom", type: "text" },
 ];
 
-const grupoTravelFields = [
-  { key: "tipo_veiculo", label: "Tipo de Veículo", type: "select", options: ["Van", "Micro-ônibus", "Ônibus"] },
-  { key: "num_passageiros", label: "Número de Passageiros", type: "text" },
-  { key: "embarque", label: "Endereço de Embarque", type: "text" },
-  { key: "destino", label: "Destino", type: "text" },
-  { key: "data_ida", label: "Data de Ida", type: "date" },
-  { key: "hora_ida", label: "Hora de Ida", type: "time" },
-  { key: "data_retorno", label: "Data de Retorno", type: "date" },
-  { key: "hora_retorno", label: "Hora de Retorno", type: "time" },
-  { key: "observacoes", label: "Observações", type: "textarea" },
-  { key: "cupom_desconto", label: "Cupom de Desconto", type: "text" },
+const grupoDocs: FieldDoc[] = [
+  { variable: "tipo_veiculo", label: "Tipo de Veículo", type: "select", required: true, options: ["Van", "Micro-ônibus", "Ônibus"] },
+  { variable: "num_passageiros", label: "Número de Passageiros", type: "number", required: true },
+  { variable: "embarque", label: "Endereço de Embarque", type: "text", required: true },
+  { variable: "destino", label: "Destino", type: "text", required: true },
+  { variable: "data_ida", label: "Data de Ida", type: "date", required: true },
+  { variable: "hora_ida", label: "Hora de Ida", type: "time", required: true },
+  { variable: "data_retorno", label: "Data de Retorno", type: "date" },
+  { variable: "hora_retorno", label: "Hora de Retorno", type: "time" },
+  { variable: "observacoes", label: "Observações", type: "textarea" },
+  { variable: "cupom_desconto", label: "Cupom de Desconto", type: "text" },
 ];
 
-const motoristaFields = [
-  { key: "cpf", label: "CPF", type: "text" },
-  { key: "data_nascimento", label: "Data de Nascimento", type: "date" },
-  { key: "endereco_completo", label: "Endereço Completo", type: "text" },
-  { key: "cidade", label: "Cidade", type: "text" },
-  { key: "estado", label: "Estado", type: "text" },
-  { key: "numero_cnh", label: "Número da CNH", type: "text" },
-  { key: "categoria_cnh", label: "Categoria da CNH", type: "select", options: ["A", "B", "C", "D", "E", "AB", "AC", "AD", "AE"] },
-  { key: "possui_veiculo", label: "Possui Veículo", type: "select", options: ["Sim", "Não"] },
-  { key: "marca_veiculo", label: "Marca do Veículo", type: "text" },
-  { key: "modelo_veiculo", label: "Modelo do Veículo", type: "text" },
-  { key: "ano_veiculo", label: "Ano do Veículo", type: "text" },
-  { key: "placa_veiculo", label: "Placa do Veículo", type: "text" },
-  { key: "experiencia", label: "Experiência", type: "textarea" },
-  { key: "mensagem_observacoes", label: "Mensagem / Observações", type: "textarea" },
+const motoristaDocs: FieldDoc[] = [
+  { variable: "cpf", label: "CPF", type: "text", required: true },
+  { variable: "data_nascimento", label: "Data de Nascimento", type: "date", required: true },
+  { variable: "endereco_completo", label: "Endereço Completo", type: "text", required: true },
+  { variable: "cidade", label: "Cidade", type: "text", required: true },
+  { variable: "estado", label: "Estado", type: "text", required: true },
+  { variable: "numero_cnh", label: "Número da CNH", type: "text", required: true },
+  { variable: "categoria_cnh", label: "Categoria da CNH", type: "select", required: true, options: ["A", "B", "C", "D", "E", "AB", "AC", "AD", "AE"] },
+  { variable: "possui_veiculo", label: "Possui Veículo", type: "select", options: ["Sim", "Não"] },
+  { variable: "marca_veiculo", label: "Marca do Veículo", type: "text" },
+  { variable: "modelo_veiculo", label: "Modelo do Veículo", type: "text" },
+  { variable: "ano_veiculo", label: "Ano do Veículo", type: "text" },
+  { variable: "placa_veiculo", label: "Placa do Veículo", type: "text" },
+  { variable: "experiencia", label: "Experiência", type: "textarea" },
+  { variable: "mensagem_observacoes", label: "Mensagem / Observações", type: "textarea" },
 ];
 
-// Personal info step (shared across all types)
-const personalInfoFields = [
-  { key: "nome_completo", label: "Nome Completo", type: "text" },
-  { key: "telefone", label: "Número de Telefone", type: "text" },
-  { key: "email", label: "E-mail", type: "text" },
-  { key: "como_encontrou", label: "Por onde nos encontrou?", type: "select", options: ["Google", "Instagram", "Facebook", "Indicação", "Outro"] },
-];
-
-type FieldDef = { key: string; label: string; type: string; options?: string[] };
-
-function FieldRenderer({ field, value, onChange }: { field: FieldDef; value: string; onChange: (v: string) => void }) {
-  if (field.type === "select") {
-    return (
-      <div className="space-y-1">
-        <Label className="text-sm">{field.label}</Label>
-        <Select value={value} onValueChange={onChange}>
-          <SelectTrigger><SelectValue placeholder={`Selecione...`} /></SelectTrigger>
-          <SelectContent>
-            {field.options?.map((opt) => (
-              <SelectItem key={opt} value={opt}>{opt}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-    );
-  }
-  if (field.type === "textarea") {
-    return (
-      <div className="space-y-1">
-        <Label className="text-sm">{field.label}</Label>
-        <Textarea placeholder={field.label} value={value} onChange={(e) => onChange(e.target.value)} rows={2} />
-      </div>
-    );
-  }
+function FieldTable({ fields, sectionTitle }: { fields: FieldDoc[]; sectionTitle: string }) {
   return (
-    <div className="space-y-1">
-      <Label className="text-sm">{field.label}</Label>
-      <Input type={field.type === "date" ? "date" : field.type === "time" ? "time" : "text"} placeholder={field.label} value={value} onChange={(e) => onChange(e.target.value)} />
+    <div className="space-y-2">
+      <h4 className="text-sm font-semibold text-foreground border-b border-border pb-1">{sectionTitle}</h4>
+      <div className="rounded-lg border border-border overflow-hidden">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="bg-muted/50">
+              <th className="text-left px-3 py-2 text-xs font-semibold text-muted-foreground uppercase">Variável</th>
+              <th className="text-left px-3 py-2 text-xs font-semibold text-muted-foreground uppercase">Campo</th>
+              <th className="text-left px-3 py-2 text-xs font-semibold text-muted-foreground uppercase">Tipo</th>
+              <th className="text-center px-3 py-2 text-xs font-semibold text-muted-foreground uppercase">Obrig.</th>
+              <th className="text-left px-3 py-2 text-xs font-semibold text-muted-foreground uppercase">Opções</th>
+            </tr>
+          </thead>
+          <tbody>
+            {fields.map((f, i) => (
+              <tr key={f.variable} className={i % 2 === 0 ? "bg-card" : "bg-muted/20"}>
+                <td className="px-3 py-1.5">
+                  <code className="text-xs font-mono bg-primary/10 text-primary px-1.5 py-0.5 rounded">{f.variable}</code>
+                </td>
+                <td className="px-3 py-1.5 text-foreground">{f.label}</td>
+                <td className="px-3 py-1.5 text-muted-foreground">{f.type}</td>
+                <td className="px-3 py-1.5 text-center">{f.required ? "✓" : "—"}</td>
+                <td className="px-3 py-1.5 text-xs text-muted-foreground">{f.options?.join(", ") || "—"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
 
-export default function FerramentasDevDialog({ open, onOpenChange, tipo, onSubmit }: FerramentasDevDialogProps) {
-  const [step, setStep] = useState(0);
-  const [formData, setFormData] = useState<Record<string, string>>({});
+function buildJsonExample(fields: FieldDoc[]): Record<string, string> {
+  const obj: Record<string, string> = {};
+  fields.forEach((f) => {
+    if (f.type === "date") obj[f.variable] = "2025-01-15";
+    else if (f.type === "time") obj[f.variable] = "14:30";
+    else if (f.type === "number") obj[f.variable] = "2";
+    else if (f.type === "email") obj[f.variable] = "cliente@email.com";
+    else if (f.options) obj[f.variable] = f.options[0];
+    else obj[f.variable] = `valor_${f.variable}`;
+  });
+  return obj;
+}
 
-  const tipoViagem = formData["tipo_viagem"] || "";
+export default function FerramentasDevDialog({ open, onOpenChange, tipo }: FerramentasDevDialogProps) {
+  const [copiedSection, setCopiedSection] = useState<string | null>(null);
 
-  const steps = useMemo(() => {
-    if (tipo === "transfer") {
-      const step1: { title: string; fields: FieldDef[] } = { title: "Tipo de Viagem", fields: transferStep1Fields };
-      let step2Fields: FieldDef[] = transferIdaFields;
-      let step2Title = "Dados da Viagem (Ida)";
-      if (tipoViagem === "Ida e Volta") {
-        step2Fields = transferIdaFields;
-        step2Title = "Dados da Ida";
-      } else if (tipoViagem === "Por Hora") {
-        step2Fields = transferPorHoraFields;
-        step2Title = "Dados da Viagem";
-      }
-
-      const result = [step1, { title: step2Title, fields: step2Fields }];
-      if (tipoViagem === "Ida e Volta") {
-        result.push({ title: "Dados da Volta", fields: transferVoltaFields });
-      }
-      result.push({ title: "Informações Pessoais", fields: personalInfoFields });
-      return result;
-    }
-    if (tipo === "grupo") {
-      return [
-        { title: "Dados da Viagem", fields: grupoTravelFields },
-        { title: "Informações Pessoais", fields: personalInfoFields },
-      ];
-    }
-    // motorista
-    return [
-      { title: "Dados do Motorista", fields: motoristaFields },
-      { title: "Informações Pessoais", fields: personalInfoFields },
-    ];
-  }, [tipo, tipoViagem]);
-
-  const currentStep = steps[step] || steps[0];
-  const isLast = step === steps.length - 1;
-
-  const updateField = (key: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [key]: value }));
+  const copyJson = (label: string, fields: FieldDoc[]) => {
+    const allFields = [...fields, ...personalFields];
+    const json = JSON.stringify(buildJsonExample(allFields), null, 2);
+    navigator.clipboard.writeText(json);
+    setCopiedSection(label);
+    toast.success(`JSON de exemplo (${label}) copiado!`);
+    setTimeout(() => setCopiedSection(null), 2000);
   };
 
-  const handleSubmit = () => {
-    onSubmit(formData);
-    setStep(0);
-    setFormData({});
-    onOpenChange(false);
-  };
+  const renderTransfer = () => (
+    <Tabs defaultValue="somente_ida" className="space-y-4">
+      <TabsList className="w-full grid grid-cols-3">
+        <TabsTrigger value="somente_ida">Somente Ida</TabsTrigger>
+        <TabsTrigger value="ida_volta">Ida e Volta</TabsTrigger>
+        <TabsTrigger value="por_hora">Por Hora</TabsTrigger>
+      </TabsList>
 
-  const handleClose = (v: boolean) => {
-    if (!v) {
-      setStep(0);
-      setFormData({});
-    }
-    onOpenChange(v);
-  };
+      <TabsContent value="somente_ida" className="space-y-4">
+        <FieldTable fields={transferIdaDocs} sectionTitle="Dados da Viagem — Somente Ida" />
+        <FieldTable fields={personalFields} sectionTitle="Informações Pessoais" />
+        <CopyJsonButton label="Somente Ida" fields={transferIdaDocs} onCopy={copyJson} copied={copiedSection} />
+      </TabsContent>
+
+      <TabsContent value="ida_volta" className="space-y-4">
+        <FieldTable fields={transferIdaDocs} sectionTitle="Dados da Ida" />
+        <FieldTable fields={transferVoltaDocs} sectionTitle="Dados da Volta" />
+        <FieldTable fields={personalFields} sectionTitle="Informações Pessoais" />
+        <CopyJsonButton label="Ida e Volta" fields={[...transferIdaDocs, ...transferVoltaDocs]} onCopy={copyJson} copied={copiedSection} />
+      </TabsContent>
+
+      <TabsContent value="por_hora" className="space-y-4">
+        <FieldTable fields={transferPorHoraDocs} sectionTitle="Dados da Viagem — Por Hora" />
+        <FieldTable fields={personalFields} sectionTitle="Informações Pessoais" />
+        <CopyJsonButton label="Por Hora" fields={transferPorHoraDocs} onCopy={copyJson} copied={copiedSection} />
+      </TabsContent>
+    </Tabs>
+  );
+
+  const renderGrupo = () => (
+    <div className="space-y-4">
+      <FieldTable fields={grupoDocs} sectionTitle="Dados da Viagem em Grupo" />
+      <FieldTable fields={personalFields} sectionTitle="Informações Pessoais" />
+      <CopyJsonButton label="Grupo" fields={grupoDocs} onCopy={copyJson} copied={copiedSection} />
+    </div>
+  );
+
+  const renderMotorista = () => (
+    <div className="space-y-4">
+      <FieldTable fields={motoristaDocs} sectionTitle="Dados do Motorista" />
+      <FieldTable fields={personalFields} sectionTitle="Informações Pessoais" />
+      <CopyJsonButton label="Motorista" fields={motoristaDocs} onCopy={copyJson} copied={copiedSection} />
+    </div>
+  );
 
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Code2 className="h-5 w-5 text-primary" />
             Ferramentas do Desenvolvedor
           </DialogTitle>
           <DialogDescription>
-            Preencha o formulário abaixo para enviar um teste de webhook. Os dados aparecerão em "Testes Recebidos".
+            Documentação dos campos e variáveis necessárias para os formulários externos. Compartilhe com o desenvolvedor para que ele construa os formulários que enviarão dados para o webhook.
           </DialogDescription>
         </DialogHeader>
 
-        {/* Step indicator */}
-        <div className="flex items-center gap-2 mb-2">
-          {steps.map((s, i) => (
-            <div key={i} className="flex items-center gap-1">
-              <div
-                className={`h-7 w-7 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${
-                  i === step
-                    ? "bg-primary text-primary-foreground"
-                    : i < step
-                    ? "bg-primary/20 text-primary"
-                    : "bg-muted text-muted-foreground"
-                }`}
-              >
-                {i + 1}
-              </div>
-              {i < steps.length - 1 && <div className="w-6 h-px bg-border" />}
-            </div>
-          ))}
-          <span className="ml-2 text-sm font-medium text-foreground">{currentStep.title}</span>
+        <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 text-sm text-foreground space-y-1">
+          <div className="flex items-center gap-2 font-semibold">
+            <FileText className="h-4 w-4 text-primary" />
+            Instruções
+          </div>
+          <p className="text-muted-foreground text-xs leading-relaxed">
+            O formulário externo deve enviar um <code className="bg-muted px-1 rounded font-mono">POST</code> para a URL do webhook com um JSON contendo as variáveis listadas abaixo. 
+            Cada campo possui sua variável correspondente (coluna "Variável") que deve ser usada como chave no JSON. 
+            Após o envio, os dados aparecerão em "Testes Recebidos". Mapeie as variáveis no painel de "Mapeamento de Campos" e ative o webhook para que os envios futuros sejam direcionados automaticamente para as Solicitações.
+          </p>
         </div>
 
-        {/* Fields */}
-        <div className="space-y-3">
-          {currentStep.fields.map((field) => (
-            <FieldRenderer
-              key={field.key}
-              field={field}
-              value={formData[field.key] || ""}
-              onChange={(v) => updateField(field.key, v)}
-            />
-          ))}
-        </div>
-
-        {/* JSON Preview */}
-        <details className="mt-4">
-          <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground transition-colors">
-            Visualizar payload JSON
-          </summary>
-          <pre className="mt-2 rounded-lg bg-muted p-3 text-xs font-mono overflow-x-auto max-h-40 text-foreground">
-            {JSON.stringify(formData, null, 2)}
-          </pre>
-        </details>
-
-        {/* Navigation */}
-        <div className="flex justify-between mt-4">
-          <Button
-            variant="outline"
-            disabled={step === 0}
-            onClick={() => setStep((s) => s - 1)}
-          >
-            <ArrowLeft className="h-4 w-4 mr-1" /> Anterior
-          </Button>
-
-          {isLast ? (
-            <Button onClick={handleSubmit}>
-              <Send className="h-4 w-4 mr-1" /> Enviar Teste
-            </Button>
-          ) : (
-            <Button onClick={() => setStep((s) => s + 1)}>
-              Próximo <ArrowRight className="h-4 w-4 ml-1" />
-            </Button>
-          )}
-        </div>
+        {tipo === "transfer" && renderTransfer()}
+        {tipo === "grupo" && renderGrupo()}
+        {tipo === "motorista" && renderMotorista()}
       </DialogContent>
     </Dialog>
+  );
+}
+
+function CopyJsonButton({
+  label,
+  fields,
+  onCopy,
+  copied,
+}: {
+  label: string;
+  fields: FieldDoc[];
+  onCopy: (label: string, fields: FieldDoc[]) => void;
+  copied: string | null;
+}) {
+  return (
+    <Button
+      variant="outline"
+      size="sm"
+      className="w-full"
+      onClick={() => onCopy(label, fields)}
+    >
+      <Copy className="h-3.5 w-3.5 mr-2" />
+      {copied === label ? "Copiado!" : `Copiar JSON de exemplo — ${label}`}
+    </Button>
   );
 }
