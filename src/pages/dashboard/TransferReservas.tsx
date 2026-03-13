@@ -60,15 +60,9 @@ export default function TransferReservasPage() {
     else toast.info("Telefone não disponível");
   };
 
-  const handleDownload = (r: Reserva) => {
-    const csv = generateCSVContent(r);
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `reserva-transfer-${r.nome_completo.replace(/\s/g, "_")}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+  const handleDownload = async (r: Reserva) => {
+    toast.info("Gerando PDF...");
+    await generateTransferPDF(r.id);
   };
 
   return (
