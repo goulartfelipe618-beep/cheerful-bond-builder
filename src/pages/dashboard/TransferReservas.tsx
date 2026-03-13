@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import CriarReservaTransferDialog from "@/components/transfer/CriarReservaTransferDialog";
 import { Badge } from "@/components/ui/badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 interface Reserva {
   id: string;
@@ -54,7 +55,7 @@ export default function TransferReservasPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Reservas</h1>
-          <p className="text-muted-foreground">Reservas convertidas a partir de solicitações</p>
+          <p className="text-muted-foreground">Reservas convertidas a partir de solicitações ({reservas.length})</p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="icon" onClick={fetchReservas}><RefreshCw className="h-4 w-4" /></Button>
@@ -64,39 +65,49 @@ export default function TransferReservasPage() {
         </div>
       </div>
 
-      <div className="rounded-xl border border-border bg-card p-6">
-        <h3 className="font-semibold text-foreground mb-3">Reservas Ativas ({reservas.length})</h3>
+      <div className="rounded-xl border border-border bg-card overflow-hidden">
         {loading ? (
-          <p className="text-sm text-muted-foreground">Carregando...</p>
+          <p className="text-sm text-muted-foreground p-6">Carregando...</p>
         ) : reservas.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Nenhuma reserva encontrada.</p>
+          <p className="text-sm text-muted-foreground p-6">Nenhuma reserva encontrada.</p>
         ) : (
-          <div className="space-y-3">
-            {reservas.map((r) => (
-              <div key={r.id} className="flex items-center justify-between rounded-lg border border-border p-4">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium text-foreground">{r.nome_completo}</span>
-                    <Badge variant="secondary">{tipoLabel[r.tipo_viagem] || r.tipo_viagem}</Badge>
-                    <Badge variant="outline">{r.status}</Badge>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    {r.ida_embarque && r.ida_desembarque ? `${r.ida_embarque} → ${r.ida_desembarque}` : "Sem trajeto definido"}
-                    {r.ida_data && ` • ${new Date(r.ida_data).toLocaleDateString("pt-BR")}`}
-                  </p>
-                  <p className="text-xs text-muted-foreground">{r.email} • {r.telefone}</p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="font-bold text-foreground">
-                    {Number(r.valor_total).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
-                  </span>
-                  <Button variant="ghost" size="icon" onClick={() => handleDelete(r.id)}>
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Cliente</TableHead>
+                <TableHead>Contato</TableHead>
+                <TableHead>Tipo</TableHead>
+                <TableHead>Trajeto</TableHead>
+                <TableHead>Data</TableHead>
+                <TableHead>Valor</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="w-[50px]" />
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {reservas.map((r) => (
+                <TableRow key={r.id}>
+                  <TableCell className="font-medium">{r.nome_completo}</TableCell>
+                  <TableCell>
+                    <div className="text-sm">{r.telefone}</div>
+                    <div className="text-xs text-muted-foreground">{r.email}</div>
+                  </TableCell>
+                  <TableCell><Badge variant="secondary">{tipoLabel[r.tipo_viagem] || r.tipo_viagem}</Badge></TableCell>
+                  <TableCell className="max-w-[200px] truncate text-sm">
+                    {r.ida_embarque && r.ida_desembarque ? `${r.ida_embarque} → ${r.ida_desembarque}` : "—"}
+                  </TableCell>
+                  <TableCell className="text-sm">{r.ida_data ? new Date(r.ida_data).toLocaleDateString("pt-BR") : "—"}</TableCell>
+                  <TableCell className="font-semibold">{Number(r.valor_total).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</TableCell>
+                  <TableCell><Badge variant="outline">{r.status}</Badge></TableCell>
+                  <TableCell>
+                    <Button variant="ghost" size="icon" onClick={() => handleDelete(r.id)}>
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         )}
       </div>
 

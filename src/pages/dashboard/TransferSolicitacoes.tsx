@@ -1,5 +1,6 @@
 import { RefreshCw, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 export default function TransferSolicitacoesPage() {
   return (
@@ -15,9 +16,28 @@ export default function TransferSolicitacoesPage() {
         </div>
       </div>
 
-      <div className="rounded-xl border border-border bg-card p-6">
-        <h3 className="font-semibold text-foreground mb-3">Solicitações Recebidas</h3>
-        <p className="text-sm text-muted-foreground">Nenhuma solicitação recebida.</p>
+      <div className="rounded-xl border border-border bg-card overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Cliente</TableHead>
+              <TableHead>Contato</TableHead>
+              <TableHead>Tipo</TableHead>
+              <TableHead>Embarque</TableHead>
+              <TableHead>Desembarque</TableHead>
+              <TableHead>Data</TableHead>
+              <TableHead>Passageiros</TableHead>
+              <TableHead>Status</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow>
+              <TableCell colSpan={8} className="text-center text-sm text-muted-foreground py-8">
+                Nenhuma solicitação recebida.
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
       </div>
     </div>
   );

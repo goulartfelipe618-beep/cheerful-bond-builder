@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import CriarReservaGrupoDialog from "@/components/grupos/CriarReservaGrupoDialog";
 import { Badge } from "@/components/ui/badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 interface ReservaGrupo {
   id: string;
@@ -55,7 +56,7 @@ export default function GruposReservasPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Reservas de Grupos</h1>
-          <p className="text-muted-foreground">Reservas convertidas a partir de solicitações de grupos</p>
+          <p className="text-muted-foreground">Reservas convertidas a partir de solicitações de grupos ({reservas.length})</p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="icon" onClick={fetchReservas}><RefreshCw className="h-4 w-4" /></Button>
@@ -65,40 +66,51 @@ export default function GruposReservasPage() {
         </div>
       </div>
 
-      <div className="rounded-xl border border-border bg-card p-6">
-        <h3 className="font-semibold text-foreground mb-3">Reservas Ativas ({reservas.length})</h3>
+      <div className="rounded-xl border border-border bg-card overflow-hidden">
         {loading ? (
-          <p className="text-sm text-muted-foreground">Carregando...</p>
+          <p className="text-sm text-muted-foreground p-6">Carregando...</p>
         ) : reservas.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Nenhuma reserva encontrada.</p>
+          <p className="text-sm text-muted-foreground p-6">Nenhuma reserva encontrada.</p>
         ) : (
-          <div className="space-y-3">
-            {reservas.map((r) => (
-              <div key={r.id} className="flex items-center justify-between rounded-lg border border-border p-4">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium text-foreground">{r.nome_completo}</span>
-                    {r.tipo_veiculo && <Badge variant="secondary">{veiculoLabel[r.tipo_veiculo] || r.tipo_veiculo}</Badge>}
-                    {r.num_passageiros && <Badge variant="outline">{r.num_passageiros} passageiros</Badge>}
-                    <Badge variant="outline">{r.status}</Badge>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    {r.embarque && r.destino ? `${r.embarque} → ${r.destino}` : "Sem trajeto definido"}
-                    {r.data_ida && ` • ${new Date(r.data_ida).toLocaleDateString("pt-BR")}`}
-                  </p>
-                  <p className="text-xs text-muted-foreground">{r.email} • {r.whatsapp}</p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="font-bold text-foreground">
-                    {Number(r.valor_total).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
-                  </span>
-                  <Button variant="ghost" size="icon" onClick={() => handleDelete(r.id)}>
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Cliente</TableHead>
+                <TableHead>Contato</TableHead>
+                <TableHead>Veículo</TableHead>
+                <TableHead>Passageiros</TableHead>
+                <TableHead>Trajeto</TableHead>
+                <TableHead>Data Ida</TableHead>
+                <TableHead>Valor</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="w-[50px]" />
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {reservas.map((r) => (
+                <TableRow key={r.id}>
+                  <TableCell className="font-medium">{r.nome_completo}</TableCell>
+                  <TableCell>
+                    <div className="text-sm">{r.whatsapp}</div>
+                    <div className="text-xs text-muted-foreground">{r.email}</div>
+                  </TableCell>
+                  <TableCell>{r.tipo_veiculo ? <Badge variant="secondary">{veiculoLabel[r.tipo_veiculo] || r.tipo_veiculo}</Badge> : "—"}</TableCell>
+                  <TableCell>{r.num_passageiros ?? "—"}</TableCell>
+                  <TableCell className="max-w-[200px] truncate text-sm">
+                    {r.embarque && r.destino ? `${r.embarque} → ${r.destino}` : "—"}
+                  </TableCell>
+                  <TableCell className="text-sm">{r.data_ida ? new Date(r.data_ida).toLocaleDateString("pt-BR") : "—"}</TableCell>
+                  <TableCell className="font-semibold">{Number(r.valor_total).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</TableCell>
+                  <TableCell><Badge variant="outline">{r.status}</Badge></TableCell>
+                  <TableCell>
+                    <Button variant="ghost" size="icon" onClick={() => handleDelete(r.id)}>
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         )}
       </div>
 
