@@ -29,12 +29,6 @@ const tipoLabel: Record<string, string> = {
   por_hora: "Por Hora",
 };
 
-function generateCSVContent(r: Reserva) {
-  const headers = "Cliente,Email,Telefone,Tipo,Embarque,Desembarque,Data,Valor,Status";
-  const row = `"${r.nome_completo}","${r.email}","${r.telefone}","${tipoLabel[r.tipo_viagem] || r.tipo_viagem}","${r.ida_embarque || ""}","${r.ida_desembarque || ""}","${r.ida_data || ""}","${r.valor_total}","${r.status}"`;
-  return `${headers}\n${row}`;
-}
-
 export default function TransferReservasPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [reservas, setReservas] = useState<Reserva[]>([]);
