@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, Search, LayoutGrid, List } from "lucide-react";
+import { Plus, Search, LayoutGrid, List, Eye, MessageSquare, Download } from "lucide-react";
 import CadastrarMotoristaDialog from "@/components/motoristas/CadastrarMotoristaDialog";
 
 export default function MotoristaCadastrosPage() {
@@ -34,6 +34,12 @@ export default function MotoristaCadastrosPage() {
       <div className="flex items-center justify-center py-20 text-muted-foreground">
         Nenhum motorista cadastrado.
       </div>
+
+      {/* Nota: Quando houver motoristas cadastrados, cada registro terá os botões:
+           - Eye (Ver detalhes) 
+           - MessageSquare (Comunicar)
+           - Download (Download arquivo)
+      */}
 
       <CadastrarMotoristaDialog open={open} onOpenChange={setOpen} />
     </div>
