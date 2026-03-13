@@ -81,7 +81,7 @@ const menuStructure = [
       { title: "Network", url: "/dashboard/network", icon: Globe },
       { title: "Google", url: "/dashboard/google", icon: Search },
       { title: "E-mail Business", url: "/dashboard/email-business", icon: Mail },
-      { title: "Website", url: "/dashboard/website", icon: MonitorSmartphone },
+      { title: "Website", url: "/dashboard/website", icon: Monitor },
     ],
   },
   {
