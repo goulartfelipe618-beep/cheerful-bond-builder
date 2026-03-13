@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, RefreshCw, Trash2 } from "lucide-react";
+import { Plus, RefreshCw, Trash2, Eye, MessageSquare, Download } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import CriarReservaTransferDialog from "@/components/transfer/CriarReservaTransferDialog";
+import DetalhesReservaTransferSheet from "@/components/reservas/DetalhesReservaTransferSheet";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
@@ -27,10 +28,18 @@ const tipoLabel: Record<string, string> = {
   por_hora: "Por Hora",
 };
 
+function generateCSVContent(r: Reserva) {
+  const headers = "Cliente,Email,Telefone,Tipo,Embarque,Desembarque,Data,Valor,Status";
+  const row = `"${r.nome_completo}","${r.email}","${r.telefone}","${tipoLabel[r.tipo_viagem] || r.tipo_viagem}","${r.ida_embarque || ""}","${r.ida_desembarque || ""}","${r.ida_data || ""}","${r.valor_total}","${r.status}"`;
+  return `${headers}\n${row}`;
+}
+
 export default function TransferReservasPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [reservas, setReservas] = useState<Reserva[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selected, setSelected] = useState<Reserva | null>(null);
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   const fetchReservas = useCallback(async () => {
     setLoading(true);
@@ -48,6 +57,23 @@ export default function TransferReservasPage() {
   const handleDelete = async (id: string) => {
     const { error } = await supabase.from("reservas_transfer").delete().eq("id", id);
     if (error) toast.error("Erro ao excluir"); else { toast.success("Reserva excluída"); fetchReservas(); }
+  };
+
+  const handleComunicar = (r: Reserva) => {
+    const phone = r.telefone?.replace(/\D/g, "");
+    if (phone) window.open(`https://wa.me/${phone}`, "_blank");
+    else toast.info("Telefone não disponível");
+  };
+
+  const handleDownload = (r: Reserva) => {
+    const csv = generateCSVContent(r);
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `reserva-transfer-${r.nome_completo.replace(/\s/g, "_")}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -81,7 +107,7 @@ export default function TransferReservasPage() {
                 <TableHead>Data</TableHead>
                 <TableHead>Valor</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead className="w-[50px]" />
+                <TableHead className="w-[140px]">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -100,9 +126,20 @@ export default function TransferReservasPage() {
                   <TableCell className="font-semibold">{Number(r.valor_total).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</TableCell>
                   <TableCell><Badge variant="outline">{r.status}</Badge></TableCell>
                   <TableCell>
-                    <Button variant="ghost" size="icon" onClick={() => handleDelete(r.id)}>
-                      <Trash2 className="h-4 w-4 text-destructive" />
-                    </Button>
+                    <div className="flex gap-1">
+                      <Button variant="ghost" size="icon" onClick={() => { setSelected(r); setSheetOpen(true); }} title="Ver detalhes">
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => handleComunicar(r)} title="Comunicar">
+                        <MessageSquare className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => handleDownload(r)} title="Download">
+                        <Download className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => handleDelete(r.id)} title="Excluir">
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
@@ -112,6 +149,14 @@ export default function TransferReservasPage() {
       </div>
 
       <CriarReservaTransferDialog open={dialogOpen} onOpenChange={setDialogOpen} onCreated={fetchReservas} />
+
+      <DetalhesReservaTransferSheet
+        reserva={selected}
+        open={sheetOpen}
+        onOpenChange={setSheetOpen}
+        onComunicar={handleComunicar}
+        onDownload={handleDownload}
+      />
     </div>
   );
 }

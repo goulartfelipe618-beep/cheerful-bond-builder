@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, RefreshCw, Trash2 } from "lucide-react";
+import { Plus, RefreshCw, Trash2, Eye, MessageSquare, Download } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import CriarReservaGrupoDialog from "@/components/grupos/CriarReservaGrupoDialog";
+import DetalhesReservaGrupoSheet from "@/components/reservas/DetalhesReservaGrupoSheet";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
@@ -28,10 +29,18 @@ const veiculoLabel: Record<string, string> = {
   onibus: "Ônibus",
 };
 
+function generateCSVContent(r: ReservaGrupo) {
+  const headers = "Cliente,Email,WhatsApp,Veículo,Passageiros,Embarque,Destino,Data,Valor,Status";
+  const row = `"${r.nome_completo}","${r.email}","${r.whatsapp}","${r.tipo_veiculo || ""}","${r.num_passageiros || ""}","${r.embarque || ""}","${r.destino || ""}","${r.data_ida || ""}","${r.valor_total}","${r.status}"`;
+  return `${headers}\n${row}`;
+}
+
 export default function GruposReservasPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [reservas, setReservas] = useState<ReservaGrupo[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selected, setSelected] = useState<ReservaGrupo | null>(null);
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   const fetchReservas = useCallback(async () => {
     setLoading(true);
@@ -49,6 +58,23 @@ export default function GruposReservasPage() {
   const handleDelete = async (id: string) => {
     const { error } = await supabase.from("reservas_grupos").delete().eq("id", id);
     if (error) toast.error("Erro ao excluir"); else { toast.success("Reserva excluída"); fetchReservas(); }
+  };
+
+  const handleComunicar = (r: ReservaGrupo) => {
+    const phone = r.whatsapp?.replace(/\D/g, "");
+    if (phone) window.open(`https://wa.me/${phone}`, "_blank");
+    else toast.info("WhatsApp não disponível");
+  };
+
+  const handleDownload = (r: ReservaGrupo) => {
+    const csv = generateCSVContent(r);
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `reserva-grupo-${r.nome_completo.replace(/\s/g, "_")}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -83,7 +109,7 @@ export default function GruposReservasPage() {
                 <TableHead>Data Ida</TableHead>
                 <TableHead>Valor</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead className="w-[50px]" />
+                <TableHead className="w-[140px]">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -103,9 +129,20 @@ export default function GruposReservasPage() {
                   <TableCell className="font-semibold">{Number(r.valor_total).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</TableCell>
                   <TableCell><Badge variant="outline">{r.status}</Badge></TableCell>
                   <TableCell>
-                    <Button variant="ghost" size="icon" onClick={() => handleDelete(r.id)}>
-                      <Trash2 className="h-4 w-4 text-destructive" />
-                    </Button>
+                    <div className="flex gap-1">
+                      <Button variant="ghost" size="icon" onClick={() => { setSelected(r); setSheetOpen(true); }} title="Ver detalhes">
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => handleComunicar(r)} title="Comunicar">
+                        <MessageSquare className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => handleDownload(r)} title="Download">
+                        <Download className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => handleDelete(r.id)} title="Excluir">
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
@@ -115,6 +152,14 @@ export default function GruposReservasPage() {
       </div>
 
       <CriarReservaGrupoDialog open={dialogOpen} onOpenChange={setDialogOpen} onCreated={fetchReservas} />
+
+      <DetalhesReservaGrupoSheet
+        reserva={selected}
+        open={sheetOpen}
+        onOpenChange={setSheetOpen}
+        onComunicar={handleComunicar}
+        onDownload={handleDownload}
+      />
     </div>
   );
 }
