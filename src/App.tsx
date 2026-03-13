@@ -33,11 +33,13 @@ import AnotacoesPage from "./pages/dashboard/AnotacoesPage";
 import SistemaConfiguracoesPage from "./pages/dashboard/SistemaConfiguracoes";
 import SistemaAutomacoesPage from "./pages/dashboard/SistemaAutomacoes";
 import SistemaComunicadorPage from "./pages/dashboard/SistemaComunicador";
+import { ConfiguracoesProvider } from "./contexts/ConfiguracoesContext";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
+    <ConfiguracoesProvider>
     <TooltipProvider>
       <Toaster />
       <Sonner />
