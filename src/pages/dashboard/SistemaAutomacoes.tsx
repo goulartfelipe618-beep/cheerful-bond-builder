@@ -185,9 +185,14 @@ export default function SistemaAutomacoesPage() {
           <span className="text-sm">Voltar</span>
         </button>
 
-        <div>
-          <h1 className="text-2xl font-bold text-foreground uppercase">{selected.tipoLabel}</h1>
-          <p className="text-muted-foreground">Configure o webhook e mapeamento de campos.</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground uppercase">{selected.tipoLabel}</h1>
+            <p className="text-muted-foreground">Configure o webhook e mapeamento de campos.</p>
+          </div>
+          <Button variant="outline" onClick={() => setDevToolsOpen(true)}>
+            <Code2 className="h-4 w-4 mr-2" /> Ferramentas do Desenvolvedor
+          </Button>
         </div>
 
         {/* Webhook URL card */}
