@@ -249,18 +249,29 @@ export default function SistemaAutomacoesPage() {
 
             {selected.testes.length === 0 ? (
               <p className="text-sm text-muted-foreground">
-                Nenhum teste recebido. Desative o webhook e envie uma requisição POST para a URL acima.
+                Nenhum teste recebido. Clique em "Ferramentas do Desenvolvedor" para enviar um teste ou envie uma requisição POST para a URL acima.
               </p>
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-2 max-h-[50vh] overflow-y-auto">
                 {selected.testes.map((t) => (
-                  <button
+                  <details
                     key={t.id}
                     className="w-full text-left rounded-lg border border-border p-3 text-sm hover:bg-muted/50 transition-colors"
                   >
-                    <p className="font-medium text-foreground">Teste #{t.id.slice(0, 6)}</p>
-                    <p className="text-xs text-muted-foreground">{t.receivedAt}</p>
-                  </button>
+                    <summary className="cursor-pointer">
+                      <span className="font-medium text-foreground">Teste #{t.id.slice(0, 6)}</span>
+                      <span className="text-xs text-muted-foreground ml-2">{t.receivedAt}</span>
+                    </summary>
+                    <div className="mt-2 space-y-1 border-t border-border pt-2">
+                      {Object.entries(t.payload).map(([key, value]) => (
+                        <div key={key} className="flex items-center gap-2">
+                          <code className="text-xs bg-muted px-1.5 py-0.5 rounded font-mono text-primary">{key}</code>
+                          <span className="text-xs text-muted-foreground">→</span>
+                          <span className="text-xs text-foreground truncate">{value || "(vazio)"}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </details>
                 ))}
               </div>
             )}
