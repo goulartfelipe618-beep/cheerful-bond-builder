@@ -7,6 +7,7 @@ import CriarReservaGrupoDialog from "@/components/grupos/CriarReservaGrupoDialog
 import DetalhesReservaGrupoSheet from "@/components/reservas/DetalhesReservaGrupoSheet";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { generateGrupoPDF } from "@/lib/pdfGenerator";
 
 interface ReservaGrupo {
   id: string;
