@@ -112,6 +112,7 @@ export function AppSidebar() {
   const collapsed = state === "collapsed";
   const location = useLocation();
   const navigate = useNavigate();
+  const { config } = useConfiguracoes();
 
   const isActive = (url: string) => location.pathname === url;
   const isGroupActive = (children: { url: string }[]) =>
