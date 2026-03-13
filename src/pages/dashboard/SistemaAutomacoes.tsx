@@ -99,6 +99,7 @@ function FieldMappingList({
 
 export default function SistemaAutomacoesPage() {
   const [open, setOpen] = useState(false);
+  const [devToolsOpen, setDevToolsOpen] = useState(false);
   const [novoNome, setNovoNome] = useState("");
   const [novoTipo, setNovoTipo] = useState("");
   const [automacoes, setAutomacoes] = useState<Automacao[]>([]);
