@@ -61,7 +61,7 @@ export default function GruposReservasPage() {
     else toast.info("WhatsApp não disponível");
   };
 
-  const handleDownload = (r: ReservaGrupo) => {
+  const handleDownload = async (r: ReservaGrupo) => {
     toast.info("Gerando PDF...");
     await generateGrupoPDF(r.id);
   };
