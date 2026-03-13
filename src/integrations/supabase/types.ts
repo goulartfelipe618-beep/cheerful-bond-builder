@@ -296,6 +296,147 @@ export type Database = {
         }
         Relationships: []
       }
+      solicitacoes_grupos: {
+        Row: {
+          created_at: string
+          data_ida: string | null
+          destino: string | null
+          embarque: string | null
+          id: string
+          mensagem: string | null
+          nome_cliente: string
+          num_passageiros: number | null
+          status: string
+          tipo_veiculo: string | null
+          updated_at: string
+          user_id: string
+          whatsapp: string | null
+        }
+        Insert: {
+          created_at?: string
+          data_ida?: string | null
+          destino?: string | null
+          embarque?: string | null
+          id?: string
+          mensagem?: string | null
+          nome_cliente: string
+          num_passageiros?: number | null
+          status?: string
+          tipo_veiculo?: string | null
+          updated_at?: string
+          user_id: string
+          whatsapp?: string | null
+        }
+        Update: {
+          created_at?: string
+          data_ida?: string | null
+          destino?: string | null
+          embarque?: string | null
+          id?: string
+          mensagem?: string | null
+          nome_cliente?: string
+          num_passageiros?: number | null
+          status?: string
+          tipo_veiculo?: string | null
+          updated_at?: string
+          user_id?: string
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
+      solicitacoes_motoristas: {
+        Row: {
+          cidade: string | null
+          cnh: string | null
+          cpf: string | null
+          created_at: string
+          email: string | null
+          id: string
+          mensagem: string | null
+          nome: string
+          status: string
+          telefone: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cidade?: string | null
+          cnh?: string | null
+          cpf?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          mensagem?: string | null
+          nome: string
+          status?: string
+          telefone?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cidade?: string | null
+          cnh?: string | null
+          cpf?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          mensagem?: string | null
+          nome?: string
+          status?: string
+          telefone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      solicitacoes_transfer: {
+        Row: {
+          contato: string | null
+          created_at: string
+          data_viagem: string | null
+          desembarque: string | null
+          embarque: string | null
+          id: string
+          mensagem: string | null
+          nome_cliente: string
+          num_passageiros: number | null
+          status: string
+          tipo: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          contato?: string | null
+          created_at?: string
+          data_viagem?: string | null
+          desembarque?: string | null
+          embarque?: string | null
+          id?: string
+          mensagem?: string | null
+          nome_cliente: string
+          num_passageiros?: number | null
+          status?: string
+          tipo?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          contato?: string | null
+          created_at?: string
+          data_viagem?: string | null
+          desembarque?: string | null
+          embarque?: string | null
+          id?: string
+          mensagem?: string | null
+          nome_cliente?: string
+          num_passageiros?: number | null
+          status?: string
+          tipo?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
