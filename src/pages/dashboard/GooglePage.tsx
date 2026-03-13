@@ -85,7 +85,7 @@ export default function GooglePage() {
       <div className="rounded-xl border border-border overflow-hidden">
         <Table>
           <TableHeader><TableRow><TableHead>Nome</TableHead><TableHead>Tipo</TableHead><TableHead>Categoria</TableHead><TableHead>Status</TableHead><TableHead>Validado</TableHead><TableHead>Ações</TableHead></TableRow></TableHeader>
-          <TableBody><TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-8">Carregando...</TableCell></TableRow></TableBody>
+          <TableBody><TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-8"><TableBody><TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-8">Nenhum registro encontrado.</TableCell></TableRow></TableBody></TableCell></TableRow></TableBody>
         </Table>
       </div>
 
