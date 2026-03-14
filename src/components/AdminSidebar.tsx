@@ -1,5 +1,5 @@
 import {
-  Home, SlidersHorizontal, LogOut, Shield, BarChart3, MapPin, FileText, ChevronDown,
+  Home, SlidersHorizontal, LogOut, Shield, BarChart3, MapPin, FileText, ChevronDown, Users, ClipboardList,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -27,6 +27,11 @@ const contratoChildren = [
   { title: "Táxi", url: "/admin/contrato/taxi", icon: FileText },
 ];
 
+const usuariosChildren = [
+  { title: "Cadastrados", url: "/admin/usuarios/cadastrados", icon: Users },
+  { title: "Solicitações", url: "/admin/usuarios/solicitacoes", icon: ClipboardList },
+];
+
 export function AdminSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
@@ -35,6 +40,7 @@ export function AdminSidebar() {
 
   const isActive = (url: string) => location.pathname === url;
   const contratoActive = contratoChildren.some((c) => isActive(c.url));
+  const usuariosActive = usuariosChildren.some((c) => isActive(c.url));
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -86,6 +92,35 @@ export function AdminSidebar() {
                   <CollapsibleContent>
                     <SidebarMenuSub>
                       {contratoChildren.map((child) => (
+                        <SidebarMenuSubItem key={child.url}>
+                          <SidebarMenuSubButton asChild>
+                            <NavLink to={child.url} end className="text-sm" activeClassName="text-primary font-medium">
+                              <child.icon className="h-3.5 w-3.5 mr-2" />
+                              {child.title}
+                            </NavLink>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      ))}
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                </SidebarMenuItem>
+              </Collapsible>
+
+              {/* Usuários collapsible */}
+              <Collapsible defaultOpen={usuariosActive}>
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton className={cn("w-full justify-between", usuariosActive && "text-primary")}>
+                      <span className="flex items-center gap-2">
+                        <Users className="h-4 w-4" />
+                        {!collapsed && <span>Usuários</span>}
+                      </span>
+                      {!collapsed && <ChevronDown className="h-4 w-4 transition-transform group-data-[state=open]:rotate-180" />}
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      {usuariosChildren.map((child) => (
                         <SidebarMenuSubItem key={child.url}>
                           <SidebarMenuSubButton asChild>
                             <NavLink to={child.url} end className="text-sm" activeClassName="text-primary font-medium">
