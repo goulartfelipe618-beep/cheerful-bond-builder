@@ -445,8 +445,8 @@ export default function EmailBusinessPage() {
               Próximo <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
           ) : (
-            <Button onClick={() => { /* submit */ }}>
-              <CheckCircle2 className="h-4 w-4 mr-2" /> Enviar Solicitação
+            <Button onClick={handleSubmitEmail} disabled={submitting}>
+              <CheckCircle2 className="h-4 w-4 mr-2" /> {submitting ? "Enviando..." : "Enviar Solicitação"}
             </Button>
           )}
         </div>
