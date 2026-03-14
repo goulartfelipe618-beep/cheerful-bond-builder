@@ -2,10 +2,11 @@ import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Car, User, Upload, Save, Key, Shield, RefreshCw, Type, Pencil, FileText } from "lucide-react";
+import { Car, User, Upload, Save, Key, Shield, RefreshCw, Type, Pencil, FileText, Users, AlertTriangle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useConfiguracoes } from "@/contexts/ConfiguracoesContext";
+import { Badge } from "@/components/ui/badge";
 
 const FONT_OPTIONS = [
   { value: "montserrat", label: "Montserrat" },
