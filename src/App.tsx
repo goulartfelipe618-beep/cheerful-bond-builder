@@ -104,6 +104,10 @@ const App = () => (
             <Route path="network" element={<AdminNetworkPage />} />
             <Route path="solicitacoes-servicos" element={<AdminSolicitacoesServicos />} />
             <Route path="templates" element={<AdminTemplatesPage />} />
+            <Route path="sistema/configuracoes" element={<SistemaConfiguracoesPage />} />
+            <Route path="sistema/automacoes" element={<SistemaAutomacoesPage />} />
+            <Route path="sistema/comunicador" element={<SistemaComunicadorPage />} />
+            <Route path="sistema/anotacoes" element={<AnotacoesPage />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>

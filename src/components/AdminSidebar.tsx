@@ -1,5 +1,5 @@
 import {
-  Home, SlidersHorizontal, LogOut, Shield, BarChart3, MapPin, FileText, ChevronDown, Users, ClipboardList, Building2, LayoutTemplate, Bell, Moon, Sun,
+  Home, SlidersHorizontal, LogOut, Shield, BarChart3, MapPin, FileText, ChevronDown, Users, ClipboardList, Building2, LayoutTemplate, Bell, Moon, Sun, Settings, StickyNote, MessageSquare, Zap,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { NavLink } from "@/components/NavLink";
@@ -37,6 +37,13 @@ const networkItem = { title: "Network", url: "/admin/network", icon: Building2 }
 const solicitacoesItem = { title: "Solicitações Serviços", url: "/admin/solicitacoes-servicos", icon: ClipboardList };
 const templatesItem = { title: "Templates", url: "/admin/templates", icon: LayoutTemplate };
 
+const sistemaChildren = [
+  { title: "Configurações", url: "/admin/sistema/configuracoes", icon: Settings },
+  { title: "Automações", url: "/admin/sistema/automacoes", icon: Zap },
+  { title: "Comunicador", url: "/admin/sistema/comunicador", icon: MessageSquare },
+  { title: "Anotações", url: "/admin/sistema/anotacoes", icon: StickyNote },
+];
+
 export function AdminSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
@@ -56,7 +63,7 @@ export function AdminSidebar() {
   const isActive = (url: string) => location.pathname === url;
   const contratoActive = contratoChildren.some((c) => isActive(c.url));
   const usuariosActive = usuariosChildren.some((c) => isActive(c.url));
-  const networkActive = isActive(networkItem.url);
+  const sistemaActive = sistemaChildren.some((c) => isActive(c.url));
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -180,6 +187,35 @@ export function AdminSidebar() {
                   </NavLink>
                 </SidebarMenuButton>
               </SidebarMenuItem>
+
+              {/* Sistema collapsible */}
+              <Collapsible defaultOpen={sistemaActive}>
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton className={cn("w-full justify-between", sistemaActive && "text-primary")}>
+                      <span className="flex items-center gap-2">
+                        <Settings className="h-4 w-4" />
+                        {!collapsed && <span>Sistema</span>}
+                      </span>
+                      {!collapsed && <ChevronDown className="h-4 w-4 transition-transform group-data-[state=open]:rotate-180" />}
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      {sistemaChildren.map((child) => (
+                        <SidebarMenuSubItem key={child.url}>
+                          <SidebarMenuSubButton asChild>
+                            <NavLink to={child.url} end className="text-sm" activeClassName="text-primary font-medium">
+                              <child.icon className="h-3.5 w-3.5 mr-2" />
+                              {child.title}
+                            </NavLink>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      ))}
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                </SidebarMenuItem>
+              </Collapsible>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
