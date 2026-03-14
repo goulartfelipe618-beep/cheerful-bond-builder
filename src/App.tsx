@@ -34,6 +34,10 @@ import AnotacoesPage from "./pages/dashboard/AnotacoesPage";
 import SistemaConfiguracoesPage from "./pages/dashboard/SistemaConfiguracoes";
 import SistemaAutomacoesPage from "./pages/dashboard/SistemaAutomacoes";
 import SistemaComunicadorPage from "./pages/dashboard/SistemaComunicador";
+import AdminLayout from "./components/AdminLayout";
+import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
+import AdminHomePage from "./pages/admin/AdminHome";
+import AdminSlidesPage from "./pages/admin/SlidesPage";
 import { ConfiguracoesProvider } from "./contexts/ConfiguracoesContext";
 
 const queryClient = new QueryClient();
