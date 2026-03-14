@@ -115,10 +115,16 @@ export function AppSidebar() {
   const navigate = useNavigate();
   const { config } = useConfiguracoes();
   const [networkAceito, setNetworkAceito] = useState(() => localStorage.getItem("network_nacional_aceito") === "sim");
+  const [showNetworkHighlight, setShowNetworkHighlight] = useState(false);
 
   useEffect(() => {
     const handler = () => {
-      setNetworkAceito(localStorage.getItem("network_nacional_aceito") === "sim");
+      const aceito = localStorage.getItem("network_nacional_aceito") === "sim";
+      setNetworkAceito(aceito);
+      // Show highlight only when just accepted
+      if (aceito && !networkAceito) {
+        setShowNetworkHighlight(true);
+      }
     };
     window.addEventListener("network-status-changed", handler);
     window.addEventListener("storage", handler);
@@ -126,7 +132,7 @@ export function AppSidebar() {
       window.removeEventListener("network-status-changed", handler);
       window.removeEventListener("storage", handler);
     };
-  }, []);
+  }, [networkAceito]);
 
   const isActive = (url: string) => location.pathname === url;
   const isGroupActive = (children: { url: string }[]) =>
