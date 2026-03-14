@@ -43,6 +43,16 @@ export function AdminSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
 
+  const [darkMode, setDarkMode] = useState(() => document.documentElement.classList.contains("dark"));
+
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [darkMode]);
+
   const isActive = (url: string) => location.pathname === url;
   const contratoActive = contratoChildren.some((c) => isActive(c.url));
   const usuariosActive = usuariosChildren.some((c) => isActive(c.url));
