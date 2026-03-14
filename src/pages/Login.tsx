@@ -42,7 +42,7 @@ const Login = () => {
     }
 
     setLoading(true);
-    const { error: authError } = await supabase.auth.signInWithPassword({
+    const { data, error: authError } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -54,7 +54,19 @@ const Login = () => {
       return;
     }
 
-    navigate("/dashboard");
+    // Check if user is admin_master
+    const { data: roleData } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", data.user.id)
+      .eq("role", "admin_master")
+      .maybeSingle();
+
+    if (roleData) {
+      navigate("/admin");
+    } else {
+      navigate("/dashboard");
+    }
   };
 
   return (

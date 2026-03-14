@@ -81,6 +81,10 @@ const App = () => (
             <Route path="sistema/automacoes" element={<SistemaAutomacoesPage />} />
             <Route path="sistema/comunicador" element={<SistemaComunicadorPage />} />
           </Route>
+          <Route path="/admin" element={<ProtectedAdminRoute><AdminLayout /></ProtectedAdminRoute>}>
+            <Route index element={<AdminHomePage />} />
+            <Route path="slides" element={<AdminSlidesPage />} />
+          </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
