@@ -1,5 +1,5 @@
 import {
-  Home, SlidersHorizontal, LogOut, Shield, BarChart3,
+  Home, SlidersHorizontal, LogOut, Shield, BarChart3, MapPin,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -13,6 +13,7 @@ import {
 const menuItems = [
   { title: "Home", url: "/admin", icon: Home },
   { title: "Métricas", url: "/admin/metricas", icon: BarChart3 },
+  { title: "Abrangência", url: "/admin/abrangencia", icon: MapPin },
   { title: "Slides", url: "/admin/slides", icon: SlidersHorizontal },
 ];
 
