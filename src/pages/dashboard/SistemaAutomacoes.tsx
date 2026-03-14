@@ -97,6 +97,7 @@ function FieldMappingList({
 }
 
 export default function SistemaAutomacoesPage() {
+  const { getFields, loaded: camposLoaded } = useCamposConfig();
   const [open, setOpen] = useState(false);
   const [devToolsOpen, setDevToolsOpen] = useState(false);
   const [novoNome, setNovoNome] = useState("");
