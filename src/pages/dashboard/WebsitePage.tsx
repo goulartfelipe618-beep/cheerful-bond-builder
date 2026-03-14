@@ -404,9 +404,9 @@ export default function WebsitePage() {
           </Button>
           <Button onClick={() => {
             if (briefingStep < 3) setBriefingStep(s => s + 1);
-            else alert("Briefing enviado com sucesso!");
-          }} className="bg-primary text-primary-foreground">
-            {briefingStep < 3 ? "Próximo" : "Revisar e Enviar"} <ArrowRight className="h-4 w-4 ml-2" />
+            else handleSubmitSolicitacao();
+          }} className="bg-primary text-primary-foreground" disabled={submitting}>
+            {briefingStep < 3 ? "Próximo" : (submitting ? "Enviando..." : "Revisar e Enviar")} <ArrowRight className="h-4 w-4 ml-2" />
           </Button>
         </div>
       </div>
