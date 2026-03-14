@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Save, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import CabecalhoContratual from "@/components/contratos/CabecalhoContratual";
 
 const DEFAULT_MODELO = `1. DAS PARTES
 1.1. O presente contrato é celebrado entre as partes abaixo qualificadas.
