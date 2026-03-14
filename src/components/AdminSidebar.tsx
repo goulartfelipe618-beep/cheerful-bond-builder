@@ -37,6 +37,13 @@ const networkItem = { title: "Network", url: "/admin/network", icon: Building2 }
 const solicitacoesItem = { title: "Solicitações Serviços", url: "/admin/solicitacoes-servicos", icon: ClipboardList };
 const templatesItem = { title: "Templates", url: "/admin/templates", icon: LayoutTemplate };
 
+const sistemaChildren = [
+  { title: "Configurações", url: "/admin/sistema/configuracoes", icon: Settings },
+  { title: "Automações", url: "/admin/sistema/automacoes", icon: Zap },
+  { title: "Comunicador", url: "/admin/sistema/comunicador", icon: MessageSquare },
+  { title: "Anotações", url: "/admin/sistema/anotacoes", icon: StickyNote },
+];
+
 export function AdminSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
