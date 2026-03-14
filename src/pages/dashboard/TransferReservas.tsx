@@ -90,6 +90,7 @@ export default function TransferReservasPage() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead>Nº</TableHead>
                 <TableHead>Cliente</TableHead>
                 <TableHead>Contato</TableHead>
                 <TableHead>Tipo</TableHead>
@@ -103,6 +104,7 @@ export default function TransferReservasPage() {
             <TableBody>
               {reservas.map((r) => (
                 <TableRow key={r.id}>
+                  <TableCell className="font-mono text-sm text-muted-foreground">#{r.numero_reserva}</TableCell>
                   <TableCell className="font-medium">{r.nome_completo}</TableCell>
                   <TableCell>
                     <div className="text-sm">{r.telefone}</div>
