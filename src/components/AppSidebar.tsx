@@ -114,6 +114,19 @@ export function AppSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { config } = useConfiguracoes();
+  const [networkAceito, setNetworkAceito] = useState(() => localStorage.getItem("network_nacional_aceito") === "sim");
+
+  useEffect(() => {
+    const handler = () => {
+      setNetworkAceito(localStorage.getItem("network_nacional_aceito") === "sim");
+    };
+    window.addEventListener("network-status-changed", handler);
+    window.addEventListener("storage", handler);
+    return () => {
+      window.removeEventListener("network-status-changed", handler);
+      window.removeEventListener("storage", handler);
+    };
+  }, []);
 
   const isActive = (url: string) => location.pathname === url;
   const isGroupActive = (children: { url: string }[]) =>
