@@ -40,6 +40,8 @@ import AdminHomePage from "./pages/admin/AdminHome";
 import AdminSlidesPage from "./pages/admin/SlidesPage";
 import AdminMetricasPage from "./pages/admin/AdminMetricas";
 import AdminAbrangenciaPage from "./pages/admin/AdminAbrangencia";
+import AdminContratoTransferPage from "./pages/admin/AdminContratoTransfer";
+import AdminContratoTaxiPage from "./pages/admin/AdminContratoTaxi";
 import { ConfiguracoesProvider } from "./contexts/ConfiguracoesContext";
 
 const queryClient = new QueryClient();
@@ -88,6 +90,8 @@ const App = () => (
             <Route path="metricas" element={<AdminMetricasPage />} />
             <Route path="abrangencia" element={<AdminAbrangenciaPage />} />
             <Route path="slides" element={<AdminSlidesPage />} />
+            <Route path="contrato/transfer" element={<AdminContratoTransferPage />} />
+            <Route path="contrato/taxi" element={<AdminContratoTaxiPage />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
