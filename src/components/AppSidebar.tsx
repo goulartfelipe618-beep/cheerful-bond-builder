@@ -22,7 +22,7 @@ import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useConfiguracoes } from "@/contexts/ConfiguracoesContext";
 
-const menuStructure = [
+const getMenuStructure = (showNetwork: boolean) => [
   {
     label: "Principal",
     items: [
@@ -85,7 +85,7 @@ const menuStructure = [
           { title: "QR Code", url: "/dashboard/marketing/qrcode", icon: Search },
         ],
       },
-      { title: "Network", url: "/dashboard/network", icon: Globe },
+      ...(showNetwork ? [{ title: "Network", url: "/dashboard/network", icon: Globe }] : []),
       { title: "Google", url: "/dashboard/google", icon: Search },
       { title: "E-mail Business", url: "/dashboard/email-business", icon: Mail },
       { title: "Website", url: "/dashboard/website", icon: Monitor },
