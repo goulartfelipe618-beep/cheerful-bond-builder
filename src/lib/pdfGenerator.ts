@@ -220,19 +220,25 @@ export async function generateGrupoPDF(reservaId: string) {
   const { data: r } = await supabase.from("reservas_grupos").select("*").eq("id", reservaId).single();
   if (!r) return;
 
-  const contrato = await fetchContrato("grupos");
+  const [contrato, cabecalho] = await Promise.all([fetchContrato("grupos"), fetchCabecalho()]);
   const doc = new jsPDF();
 
-  doc.setFontSize(16);
+  let y = 20;
+
+  if (cabecalho && cabecalho.razao_social) {
+    y = addCabecalhoHeader(doc, cabecalho);
+  }
+
+  doc.setFontSize(14);
   doc.setFont("helvetica", "bold");
-  doc.text("CONFIRMAÇÃO DE RESERVA — GRUPO", 14, 20);
+  doc.text("CONFIRMAÇÃO DE RESERVA — GRUPO", 14, y);
   doc.setFontSize(8);
   doc.setFont("helvetica", "normal");
   doc.setTextColor(120);
-  doc.text(`Gerado em ${new Date().toLocaleString("pt-BR")}`, 14, 26);
+  y += 6;
+  doc.text(`Gerado em ${new Date().toLocaleString("pt-BR")}`, 14, y);
   doc.setTextColor(0);
-
-  let y = 34;
+  y += 8;
 
   y = addSection(doc, "DADOS DO CLIENTE", [
     { label: "Nome", value: r.nome_completo },
