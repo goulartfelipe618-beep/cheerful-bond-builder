@@ -187,10 +187,15 @@ export default function SistemaAutomacoesPage() {
     if (!selected) return;
     const { error } = await supabase
       .from("automacoes")
-      .update({ mappings, updated_at: new Date().toISOString() })
+      .update({ mappings: mappings as any, updated_at: new Date().toISOString() })
       .eq("id", selected.id);
     if (error) toast.error("Erro ao salvar");
-    else toast.success("Mapeamento salvo com sucesso!");
+    else {
+      toast.success("Mapeamento salvo com sucesso!");
+      // Update local state
+      setAutomacoes((prev) => prev.map((a) => a.id === selected.id ? { ...a, mappings } : a));
+      setSelected({ ...selected, mappings });
+    }
   };
 
   const handleTestSubmit = (payload: Record<string, string>) => {
@@ -378,7 +383,21 @@ export default function SistemaAutomacoesPage() {
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-1">
-                      <Button variant="ghost" size="sm" onClick={() => { setSelected(a); setMappings(a.mappings || {}); }}>
+                      <Button variant="ghost" size="sm" onClick={() => {
+                        const m = (a.mappings && typeof a.mappings === "object") ? a.mappings : {};
+                        // Ensure default tab exists for grupo/motorista
+                        if (a.tipo !== "transfer" && !m["default"]) {
+                          m["default"] = {};
+                        }
+                        // Ensure transfer tabs exist
+                        if (a.tipo === "transfer") {
+                          if (!m["somente_ida"]) m["somente_ida"] = {};
+                          if (!m["ida_volta"]) m["ida_volta"] = {};
+                          if (!m["por_hora"]) m["por_hora"] = {};
+                        }
+                        setSelected(a);
+                        setMappings(m);
+                      }}>
                         Configurar
                       </Button>
                       <Button variant="ghost" size="icon" onClick={() => handleDelete(a.id)}>
