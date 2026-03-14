@@ -479,6 +479,9 @@ export default function SistemaConfiguracoesPage() {
         </div>
       </div>
 
+      {/* Network Nacional */}
+      <NetworkSection />
+
       {/* Hard Refresh */}
       <div className="rounded-xl border border-border bg-card p-6 max-w-2xl">
         <div className="flex items-center gap-2 mb-1">
