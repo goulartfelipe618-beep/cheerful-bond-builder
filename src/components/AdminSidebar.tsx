@@ -188,6 +188,18 @@ export function AdminSidebar() {
       <SidebarFooter className="border-t border-border">
         <SidebarMenu>
           <SidebarMenuItem>
+            <SidebarMenuButton className="w-full">
+              <Bell className="h-4 w-4 mr-2" />
+              {!collapsed && <span>Notificações</span>}
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton className="w-full" onClick={() => setDarkMode(!darkMode)}>
+              {darkMode ? <Sun className="h-4 w-4 mr-2" /> : <Moon className="h-4 w-4 mr-2" />}
+              {!collapsed && <span>{darkMode ? "Modo Claro" : "Modo Escuro"}</span>}
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
             <SidebarMenuButton className="w-full" onClick={handleLogout}>
               <LogOut className="h-4 w-4 mr-2" />
               {!collapsed && <span>Sair</span>}
