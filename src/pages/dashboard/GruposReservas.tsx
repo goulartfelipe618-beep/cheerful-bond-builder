@@ -11,6 +11,7 @@ import { generateGrupoPDF } from "@/lib/pdfGenerator";
 
 interface ReservaGrupo {
   id: string;
+  numero_reserva: number;
   nome_completo: string;
   email: string;
   whatsapp: string;
