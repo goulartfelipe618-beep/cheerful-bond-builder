@@ -41,7 +41,7 @@ export default function TransferReservasPage() {
     setLoading(true);
     const { data, error } = await supabase
       .from("reservas_transfer")
-      .select("id, nome_completo, email, telefone, tipo_viagem, valor_total, status, created_at, ida_embarque, ida_desembarque, ida_data")
+      .select("id, numero_reserva, nome_completo, email, telefone, tipo_viagem, valor_total, status, created_at, ida_embarque, ida_desembarque, ida_data")
       .order("created_at", { ascending: false });
     if (error) toast.error("Erro ao carregar reservas");
     else setReservas(data || []);
