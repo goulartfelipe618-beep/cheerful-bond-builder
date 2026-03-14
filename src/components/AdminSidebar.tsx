@@ -105,6 +105,35 @@ export function AdminSidebar() {
                   </CollapsibleContent>
                 </SidebarMenuItem>
               </Collapsible>
+
+              {/* Usuários collapsible */}
+              <Collapsible defaultOpen={usuariosActive}>
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton className={cn("w-full justify-between", usuariosActive && "text-primary")}>
+                      <span className="flex items-center gap-2">
+                        <Users className="h-4 w-4" />
+                        {!collapsed && <span>Usuários</span>}
+                      </span>
+                      {!collapsed && <ChevronDown className="h-4 w-4 transition-transform group-data-[state=open]:rotate-180" />}
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      {usuariosChildren.map((child) => (
+                        <SidebarMenuSubItem key={child.url}>
+                          <SidebarMenuSubButton asChild>
+                            <NavLink to={child.url} end className="text-sm" activeClassName="text-primary font-medium">
+                              <child.icon className="h-3.5 w-3.5 mr-2" />
+                              {child.title}
+                            </NavLink>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      ))}
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                </SidebarMenuItem>
+              </Collapsible>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
