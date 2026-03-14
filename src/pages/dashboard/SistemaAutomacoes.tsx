@@ -187,10 +187,15 @@ export default function SistemaAutomacoesPage() {
     if (!selected) return;
     const { error } = await supabase
       .from("automacoes")
-      .update({ mappings, updated_at: new Date().toISOString() })
+      .update({ mappings: mappings as any, updated_at: new Date().toISOString() })
       .eq("id", selected.id);
     if (error) toast.error("Erro ao salvar");
-    else toast.success("Mapeamento salvo com sucesso!");
+    else {
+      toast.success("Mapeamento salvo com sucesso!");
+      // Update local state
+      setAutomacoes((prev) => prev.map((a) => a.id === selected.id ? { ...a, mappings } : a));
+      setSelected({ ...selected, mappings });
+    }
   };
 
   const handleTestSubmit = (payload: Record<string, string>) => {
