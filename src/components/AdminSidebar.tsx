@@ -32,6 +32,8 @@ const usuariosChildren = [
   { title: "Solicitações", url: "/admin/usuarios/solicitacoes", icon: ClipboardList },
 ];
 
+const networkItem = { title: "Network", url: "/admin/network", icon: Building2 };
+
 export function AdminSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
