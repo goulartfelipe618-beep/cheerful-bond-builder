@@ -81,6 +81,7 @@ export default function HomePage() {
   const handleRecusarNetwork = () => {
     localStorage.setItem("network_nacional_aceito", "nao");
     setNetworkAceito(false);
+    window.dispatchEvent(new Event("network-status-changed"));
   };
 
   return (
