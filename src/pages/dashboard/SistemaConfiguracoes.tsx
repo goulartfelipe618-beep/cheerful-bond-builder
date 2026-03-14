@@ -94,10 +94,15 @@ export default function SistemaConfiguracoesPage() {
       setNomeCompleto(d.nome_completo || "");
       setTelefone(d.telefone || "");
       setEmail(d.email || "");
+      setCidade(d.cidade || "");
+      setEstado(d.estado || "");
+      setEnderecoCompleto(d.endereco_completo || "");
+      setNomeEmpresa(d.nome_empresa || "");
+      setCnpjPerfil(d.cnpj || "");
       setNomeProjeto(d.nome_projeto || "E-Transporte.pro");
       setFonteGlobal(d.fonte_global || "montserrat");
       setLogoUrl(d.logo_url || "");
-      if (d.nome_completo || d.telefone || d.email) {
+      if (d.nome_completo && d.telefone && d.email && d.cidade && d.nome_empresa && d.cnpj) {
         setProfileEditing(false);
       }
     } else {
