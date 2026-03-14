@@ -48,9 +48,31 @@ export default function SistemaConfiguracoesPage() {
 
   useEffect(() => {
     loadSettings();
+    loadContratual();
   }, []);
 
-  const loadSettings = async () => {
+  const loadContratual = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const { data } = await supabase
+      .from("cabecalho_contratual" as any)
+      .select("*")
+      .eq("user_id", user.id)
+      .maybeSingle();
+    if (data) {
+      const d = data as any;
+      setRazaoSocial(d.razao_social || "");
+      setCnpj(d.cnpj || "");
+      setEnderecoSede(d.endereco_sede || "");
+      setRepresentanteLegal(d.representante_legal || "");
+      setLogoContratualUrl(d.logo_contratual_url || "");
+      setTelefoneContratual(d.telefone || "");
+      setWhatsappContratual(d.whatsapp || "");
+      setEmailOficial(d.email_oficial || "");
+      setContratualEditing(false);
+      setContratualSaved(true);
+    }
+  };
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
