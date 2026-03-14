@@ -110,6 +110,128 @@ export default function WebsitePage() {
 
   const selectedTemplateName = templates.find(t => t.id === selectedTemplate)?.name || "";
 
+  // Check for existing active service
+  useEffect(() => {
+    const checkServico = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data } = await (supabase.from("solicitacoes_servicos" as any).select("*").eq("user_id", user.id).eq("tipo_servico", "website").order("created_at", { ascending: false }).limit(1) as any);
+      if (data && data.length > 0) {
+        const s = data[0];
+        if (s.status === "concluido") {
+          setServicoAtivo(s);
+          setStep("servico_ativo");
+        } else if (s.status === "pendente" || s.status === "em_andamento") {
+          setServicoAtivo(s);
+        }
+      }
+    };
+    checkServico();
+  }, []);
+
+  const handleSubmitSolicitacao = async () => {
+    setSubmitting(true);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { toast.error("Não autenticado"); setSubmitting(false); return; }
+    const { error } = await (supabase.from("solicitacoes_servicos" as any).insert({
+      user_id: user.id,
+      tipo_servico: "website",
+      dados_solicitacao: {
+        template: selectedTemplateName,
+        template_id: selectedTemplate,
+        dominio: domain,
+        provedor: provider,
+        possui_dominio: hasDomain,
+        servicos: selectedServices,
+        nome_empresa: companyName,
+        cidade: city,
+        regiao: region,
+        frota: fleet,
+        whatsapp,
+        email,
+        diferenciais: differentials,
+        redes_sociais: socialMedia,
+        trabalha_24h: works24h,
+        publico_alvo: targetAudience,
+        faixa_preco: priceRange,
+        formulario_orcamento: wantsBudgetForm,
+        integracao_whatsapp: wantsWhatsappIntegration,
+        possui_logo: hasLogo,
+        cores_preferidas: preferredColors,
+        estilo: desiredStyle,
+        funcionalidades: selectedFeatures,
+      },
+    } as any) as any);
+    setSubmitting(false);
+    if (error) { toast.error("Erro ao enviar: " + error.message); return; }
+    toast.success("Solicitação enviada com sucesso! O administrador irá processar seu pedido.");
+    setBriefingStep(1);
+    setStep("gallery");
+  };
+
+  // Active service view
+  if (step === "servico_ativo" && servicoAtivo) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+            <CheckCircle2 className="h-6 w-6 text-primary" /> Website — Serviço Ativo
+          </h1>
+          <p className="text-muted-foreground">Seu website foi configurado e está pronto para uso.</p>
+        </div>
+        <div className="rounded-xl border border-primary/30 bg-card p-6 space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {servicoAtivo.link_acesso && (
+              <div className="space-y-1">
+                <p className="text-sm text-muted-foreground">Link de Acesso</p>
+                <a href={servicoAtivo.link_acesso} target="_blank" rel="noopener noreferrer" className="text-primary font-medium flex items-center gap-1 hover:underline">
+                  <ExternalLink className="h-4 w-4" /> {servicoAtivo.link_acesso}
+                </a>
+              </div>
+            )}
+            {servicoAtivo.data_expiracao && (
+              <div className="space-y-1">
+                <p className="text-sm text-muted-foreground">Válido até</p>
+                <p className="text-foreground font-medium flex items-center gap-1">
+                  <Calendar className="h-4 w-4" /> {new Date(servicoAtivo.data_expiracao).toLocaleDateString("pt-BR")}
+                </p>
+              </div>
+            )}
+          </div>
+          {servicoAtivo.instrucoes_acesso && (
+            <div className="space-y-1">
+              <p className="text-sm text-muted-foreground">Instruções de Acesso</p>
+              <p className="text-foreground whitespace-pre-wrap">{servicoAtivo.instrucoes_acesso}</p>
+            </div>
+          )}
+          {servicoAtivo.como_usar && (
+            <div className="space-y-1">
+              <p className="text-sm text-muted-foreground">Como Usar</p>
+              <p className="text-foreground whitespace-pre-wrap">{servicoAtivo.como_usar}</p>
+            </div>
+          )}
+          {servicoAtivo.observacoes_admin && (
+            <div className="rounded-lg border border-border bg-muted/30 p-3 space-y-1">
+              <p className="text-sm font-medium text-foreground flex items-center gap-1"><Info className="h-4 w-4" /> Observações</p>
+              <p className="text-sm text-muted-foreground whitespace-pre-wrap">{servicoAtivo.observacoes_admin}</p>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Show pending banner if exists
+  const pendingBanner = servicoAtivo && (servicoAtivo.status === "pendente" || servicoAtivo.status === "em_andamento") ? (
+    <div className="rounded-xl border border-yellow-500/30 bg-yellow-500/10 p-4 flex items-center gap-3">
+      <Info className="h-5 w-5 text-yellow-600" />
+      <div>
+        <p className="text-sm font-semibold text-foreground">Solicitação em análise</p>
+        <p className="text-xs text-muted-foreground">Sua solicitação de website está sendo processada pelo administrador. Status: <Badge variant="outline">{servicoAtivo.status === "pendente" ? "Pendente" : "Em andamento"}</Badge></p>
+      </div>
+    </div>
+  ) : null;
+
   if (step === "briefing") {
     return (
       <div className="space-y-6">
