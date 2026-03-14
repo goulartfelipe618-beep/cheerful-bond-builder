@@ -101,6 +101,7 @@ const App = () => (
             <Route path="usuarios/cadastrados" element={<AdminUsuariosCadastradosPage />} />
             <Route path="usuarios/solicitacoes" element={<AdminUsuariosSolicitacoesPage />} />
             <Route path="network" element={<AdminNetworkPage />} />
+            <Route path="solicitacoes-servicos" element={<AdminSolicitacoesServicos />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
