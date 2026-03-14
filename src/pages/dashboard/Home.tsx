@@ -75,11 +75,13 @@ export default function HomePage() {
     localStorage.setItem("network_nacional_aceito", "sim");
     setNetworkAceito(true);
     setMostrarRegras(false);
+    window.dispatchEvent(new Event("network-status-changed"));
   };
 
   const handleRecusarNetwork = () => {
     localStorage.setItem("network_nacional_aceito", "nao");
     setNetworkAceito(false);
+    window.dispatchEvent(new Event("network-status-changed"));
   };
 
   return (
@@ -231,7 +233,7 @@ export default function HomePage() {
             <Users className="h-5 w-5 text-muted-foreground" />
             <p className="text-sm text-muted-foreground">Você optou por não participar do Network Nacional.</p>
           </div>
-          <Button variant="outline" size="sm" onClick={() => { setNetworkAceito(null); localStorage.removeItem("network_nacional_aceito"); }}>
+          <Button variant="outline" size="sm" onClick={() => { setNetworkAceito(null); localStorage.removeItem("network_nacional_aceito"); window.dispatchEvent(new Event("network-status-changed")); }}>
             Reconsiderar
           </Button>
         </div>

@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import {
   LayoutDashboard, Home, Activity, MapPin, ArrowLeftRight,
   FileText, BookOpen, Map, Users, UserCheck, Handshake,
@@ -21,7 +22,7 @@ import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useConfiguracoes } from "@/contexts/ConfiguracoesContext";
 
-const menuStructure = [
+const getMenuStructure = (showNetwork: boolean) => [
   {
     label: "Principal",
     items: [
@@ -84,7 +85,7 @@ const menuStructure = [
           { title: "QR Code", url: "/dashboard/marketing/qrcode", icon: Search },
         ],
       },
-      { title: "Network", url: "/dashboard/network", icon: Globe },
+      ...(showNetwork ? [{ title: "Network", url: "/dashboard/network", icon: Globe }] : []),
       { title: "Google", url: "/dashboard/google", icon: Search },
       { title: "E-mail Business", url: "/dashboard/email-business", icon: Mail },
       { title: "Website", url: "/dashboard/website", icon: Monitor },
@@ -113,6 +114,19 @@ export function AppSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { config } = useConfiguracoes();
+  const [networkAceito, setNetworkAceito] = useState(() => localStorage.getItem("network_nacional_aceito") === "sim");
+
+  useEffect(() => {
+    const handler = () => {
+      setNetworkAceito(localStorage.getItem("network_nacional_aceito") === "sim");
+    };
+    window.addEventListener("network-status-changed", handler);
+    window.addEventListener("storage", handler);
+    return () => {
+      window.removeEventListener("network-status-changed", handler);
+      window.removeEventListener("storage", handler);
+    };
+  }, []);
 
   const isActive = (url: string) => location.pathname === url;
   const isGroupActive = (children: { url: string }[]) =>
@@ -142,7 +156,7 @@ export function AppSidebar() {
       </div>
 
       <SidebarContent>
-        {menuStructure.map((group) => (
+        {getMenuStructure(networkAceito).map((group) => (
           <SidebarGroup key={group.label}>
             <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
             <SidebarGroupContent>
