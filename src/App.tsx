@@ -84,6 +84,7 @@ const App = () => (
           </Route>
           <Route path="/admin" element={<ProtectedAdminRoute><AdminLayout /></ProtectedAdminRoute>}>
             <Route index element={<AdminHomePage />} />
+            <Route path="metricas" element={<AdminMetricasPage />} />
             <Route path="slides" element={<AdminSlidesPage />} />
           </Route>
           <Route path="*" element={<NotFound />} />
