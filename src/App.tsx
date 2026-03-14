@@ -38,6 +38,7 @@ import AdminLayout from "./components/AdminLayout";
 import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
 import AdminHomePage from "./pages/admin/AdminHome";
 import AdminSlidesPage from "./pages/admin/SlidesPage";
+import AdminMetricasPage from "./pages/admin/AdminMetricas";
 import { ConfiguracoesProvider } from "./contexts/ConfiguracoesContext";
 
 const queryClient = new QueryClient();
