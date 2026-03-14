@@ -73,6 +73,8 @@ export default function SistemaConfiguracoesPage() {
       setContratualSaved(true);
     }
   };
+
+  const loadSettings = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
@@ -90,7 +92,6 @@ export default function SistemaConfiguracoesPage() {
       setNomeProjeto(d.nome_projeto || "E-Transporte.pro");
       setFonteGlobal(d.fonte_global || "montserrat");
       setLogoUrl(d.logo_url || "");
-      // If profile was previously saved, start in locked mode
       if (d.nome_completo || d.telefone || d.email) {
         setProfileEditing(false);
       }
