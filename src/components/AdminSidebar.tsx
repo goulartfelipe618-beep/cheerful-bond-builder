@@ -148,6 +148,16 @@ export function AdminSidebar() {
                   </CollapsibleContent>
                 </SidebarMenuItem>
               </Collapsible>
+
+              {/* Solicitações Serviços */}
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <NavLink to={solicitacoesItem.url} end className="hover:bg-muted/50" activeClassName="bg-muted text-primary font-medium">
+                    <solicitacoesItem.icon className="h-4 w-4 mr-2" />
+                    {!collapsed && <span>{solicitacoesItem.title}</span>}
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
