@@ -44,6 +44,7 @@ import AdminContratoTransferPage from "./pages/admin/AdminContratoTransfer";
 import AdminContratoTaxiPage from "./pages/admin/AdminContratoTaxi";
 import AdminUsuariosCadastradosPage from "./pages/admin/AdminUsuariosCadastrados";
 import AdminUsuariosSolicitacoesPage from "./pages/admin/AdminUsuariosSolicitacoes";
+import SolicitarAcessoPage from "./pages/SolicitarAcesso";
 import { ConfiguracoesProvider } from "./contexts/ConfiguracoesContext";
 
 const queryClient = new QueryClient();
