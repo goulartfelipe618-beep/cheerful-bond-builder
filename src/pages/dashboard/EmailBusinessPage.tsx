@@ -158,6 +158,7 @@ export default function EmailBusinessPage() {
   if (!wizardActive) {
     return (
       <div className="space-y-8">
+        {pendingBanner}
         {/* Carousel */}
         <div className="relative rounded-xl overflow-hidden bg-gradient-to-br from-slate-800 to-slate-900 h-80 flex items-center">
           <Button variant="ghost" size="icon" className="absolute left-2 z-10 bg-background/20 hover:bg-background/40 text-primary-foreground rounded-full" onClick={() => setCurrentSlide((p) => (p === 0 ? slides.length - 1 : p - 1))}><ChevronLeft className="h-5 w-5" /></Button>
