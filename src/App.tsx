@@ -34,7 +34,10 @@ import AnotacoesPage from "./pages/dashboard/AnotacoesPage";
 import SistemaConfiguracoesPage from "./pages/dashboard/SistemaConfiguracoes";
 import SistemaAutomacoesPage from "./pages/dashboard/SistemaAutomacoes";
 import SistemaComunicadorPage from "./pages/dashboard/SistemaComunicador";
-import SlidesPage from "./pages/dashboard/SlidesPage";
+import AdminLayout from "./components/AdminLayout";
+import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
+import AdminHomePage from "./pages/admin/AdminHome";
+import AdminSlidesPage from "./pages/admin/SlidesPage";
 import { ConfiguracoesProvider } from "./contexts/ConfiguracoesContext";
 
 const queryClient = new QueryClient();
@@ -51,7 +54,6 @@ const App = () => (
           <Route path="/login" element={<Login />} />
           <Route path="/dashboard" element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
             <Route index element={<HomePage />} />
-            <Route path="slides" element={<SlidesPage />} />
             <Route path="metricas" element={<MetricasPage />} />
             <Route path="abrangencia" element={<PlaceholderPage />} />
             <Route path="transfer/solicitacoes" element={<TransferSolicitacoesPage />} />
@@ -78,6 +80,10 @@ const App = () => (
             <Route path="sistema/configuracoes" element={<SistemaConfiguracoesPage />} />
             <Route path="sistema/automacoes" element={<SistemaAutomacoesPage />} />
             <Route path="sistema/comunicador" element={<SistemaComunicadorPage />} />
+          </Route>
+          <Route path="/admin" element={<ProtectedAdminRoute><AdminLayout /></ProtectedAdminRoute>}>
+            <Route index element={<AdminHomePage />} />
+            <Route path="slides" element={<AdminSlidesPage />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
