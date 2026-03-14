@@ -75,6 +75,7 @@ export default function HomePage() {
     localStorage.setItem("network_nacional_aceito", "sim");
     setNetworkAceito(true);
     setMostrarRegras(false);
+    window.dispatchEvent(new Event("network-status-changed"));
   };
 
   const handleRecusarNetwork = () => {
