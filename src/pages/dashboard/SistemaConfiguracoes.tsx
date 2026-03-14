@@ -169,6 +169,60 @@ export default function SistemaConfiguracoesPage() {
     setUploading(false);
   };
 
+  const handleSaveContratual = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { toast.error("Não autenticado"); return; }
+
+    const payload = {
+      user_id: user.id,
+      nome: "Cabeçalho 1",
+      razao_social: razaoSocial,
+      cnpj,
+      endereco_sede: enderecoSede,
+      representante_legal: representanteLegal,
+      logo_contratual_url: logoContratualUrl,
+      telefone: telefoneContratual,
+      whatsapp: whatsappContratual,
+      email_oficial: emailOficial,
+      updated_at: new Date().toISOString(),
+    };
+
+    const { data: existing } = await supabase
+      .from("cabecalho_contratual" as any)
+      .select("id")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    let error;
+    if (existing) {
+      ({ error } = await supabase.from("cabecalho_contratual" as any).update(payload as any).eq("user_id", user.id));
+    } else {
+      ({ error } = await supabase.from("cabecalho_contratual" as any).insert(payload as any));
+    }
+
+    if (error) { toast.error("Erro ao salvar informações contratuais"); return; }
+    toast.success("Cabeçalho 1 salvo com sucesso");
+    setContratualEditing(false);
+    setContratualSaved(true);
+  };
+
+  const handleLogoContratualUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingLogoContratual("uploading");
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { toast.error("Não autenticado"); setUploadingLogoContratual(""); return; }
+
+    const filePath = `${user.id}/logo-contratual-${Date.now()}.${file.name.split('.').pop()}`;
+    const { error: upErr } = await supabase.storage.from("logos").upload(filePath, file, { upsert: true });
+    if (upErr) { toast.error("Erro no upload"); setUploadingLogoContratual(""); return; }
+
+    const { data: urlData } = supabase.storage.from("logos").getPublicUrl(filePath);
+    setLogoContratualUrl(urlData.publicUrl);
+    toast.success("Logotipo contratual enviado");
+    setUploadingLogoContratual("");
+  };
+
   return (
     <div className="space-y-6">
       <div>
