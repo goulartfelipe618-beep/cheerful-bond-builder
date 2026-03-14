@@ -110,7 +110,8 @@ export default function SistemaAutomacoesPage() {
   const [selected, setSelected] = useState<Automacao | null>(null);
   const [mappings, setMappings] = useState<Record<string, Record<string, string>>>({});
   const [loading, setLoading] = useState(true);
-
+  const [testes, setTestes] = useState<WebhookTeste[]>([]);
+  const [selectedTeste, setSelectedTeste] = useState<WebhookTeste | null>(null);
   const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID || "seu-projeto";
 
   const fetchAutomacoes = useCallback(async () => {
