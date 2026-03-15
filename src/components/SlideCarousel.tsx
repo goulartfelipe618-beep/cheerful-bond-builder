@@ -25,7 +25,7 @@ export default function SlideCarousel({ pagina, fallbackSlides }: SlideCarouselP
     const fetchSlides = async () => {
       const { data } = await supabase
         .from("slides")
-        .select("id, titulo, subtitulo, imagem_url, mostrar_texto")
+        .select("id, titulo, subtitulo, imagem_url, mostrar_texto, link_url")
         .eq("pagina", pagina)
         .eq("ativo", true)
         .order("ordem", { ascending: true });
