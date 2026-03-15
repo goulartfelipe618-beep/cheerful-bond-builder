@@ -8,11 +8,12 @@ interface SlideData {
   subtitulo: string;
   imagem_url: string;
   mostrar_texto: boolean;
+  link_url: string;
 }
 
 interface SlideCarouselProps {
   pagina: string;
-  fallbackSlides?: { titulo: string; subtitulo: string; imagem_url?: string; mostrar_texto?: boolean }[];
+  fallbackSlides?: { titulo: string; subtitulo: string; imagem_url?: string; mostrar_texto?: boolean; link_url?: string }[];
 }
 
 export default function SlideCarousel({ pagina, fallbackSlides }: SlideCarouselProps) {
@@ -24,7 +25,7 @@ export default function SlideCarousel({ pagina, fallbackSlides }: SlideCarouselP
     const fetchSlides = async () => {
       const { data } = await supabase
         .from("slides")
-        .select("id, titulo, subtitulo, imagem_url, mostrar_texto")
+        .select("id, titulo, subtitulo, imagem_url, mostrar_texto, link_url")
         .eq("pagina", pagina)
         .eq("ativo", true)
         .order("ordem", { ascending: true });
@@ -48,18 +49,26 @@ export default function SlideCarousel({ pagina, fallbackSlides }: SlideCarouselP
   const currentSlideData = displaySlides[currentSlide];
   const hasImage = !!currentSlideData?.imagem_url;
   const showText = currentSlideData?.mostrar_texto && (currentSlideData.titulo || currentSlideData.subtitulo);
+  const linkUrl = currentSlideData?.link_url;
+
+  const imageElement = hasImage ? (
+    <img
+      src={displaySlides[currentSlide].imagem_url}
+      alt={displaySlides[currentSlide].titulo || "Slide"}
+      className="w-full h-auto block"
+    />
+  ) : (
+    <div className="h-72 bg-gradient-to-r from-primary/80 to-primary" />
+  );
 
   return (
     <div className="relative rounded-xl overflow-hidden w-full">
-      {hasImage ? (
-        /* Imagem no tamanho original — sem corte, sem altura fixa */
-        <img
-          src={displaySlides[currentSlide].imagem_url}
-          alt={displaySlides[currentSlide].titulo || "Slide"}
-          className="w-full h-auto block"
-        />
+      {linkUrl ? (
+        <a href={linkUrl} target="_blank" rel="noopener noreferrer" className="block cursor-pointer">
+          {imageElement}
+        </a>
       ) : (
-        <div className="h-72 bg-gradient-to-r from-primary/80 to-primary" />
+        imageElement
       )}
 
       {/* Overlay com texto — só aparece se mostrar_texto estiver ativo */}

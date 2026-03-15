@@ -587,6 +587,7 @@ export type Database = {
           created_at: string
           id: string
           imagem_url: string
+          link_url: string | null
           mostrar_texto: boolean
           ordem: number
           pagina: string
@@ -600,6 +601,7 @@ export type Database = {
           created_at?: string
           id?: string
           imagem_url?: string
+          link_url?: string | null
           mostrar_texto?: boolean
           ordem?: number
           pagina?: string
@@ -613,6 +615,7 @@ export type Database = {
           created_at?: string
           id?: string
           imagem_url?: string
+          link_url?: string | null
           mostrar_texto?: boolean
           ordem?: number
           pagina?: string

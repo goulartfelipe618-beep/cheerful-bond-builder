@@ -34,7 +34,7 @@ export default function SlidesPage() {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Slide | null>(null);
-  const [form, setForm] = useState({ titulo: "", subtitulo: "", imagem_url: "", mostrar_texto: false });
+  const [form, setForm] = useState({ titulo: "", subtitulo: "", imagem_url: "", mostrar_texto: false, link_url: "" });
   const [uploading, setUploading] = useState(false);
   const [paginaSelecionada, setPaginaSelecionada] = useState("home");
 
@@ -55,13 +55,13 @@ export default function SlidesPage() {
 
   const openCreate = () => {
     setEditing(null);
-    setForm({ titulo: "", subtitulo: "", imagem_url: "", mostrar_texto: false });
+    setForm({ titulo: "", subtitulo: "", imagem_url: "", mostrar_texto: false, link_url: "" });
     setDialogOpen(true);
   };
 
   const openEdit = (s: Slide) => {
     setEditing(s);
-    setForm({ titulo: s.titulo, subtitulo: s.subtitulo, imagem_url: s.imagem_url, mostrar_texto: s.mostrar_texto });
+    setForm({ titulo: s.titulo, subtitulo: s.subtitulo, imagem_url: s.imagem_url, mostrar_texto: s.mostrar_texto, link_url: (s as any).link_url || "" });
     setDialogOpen(true);
   };
 
@@ -93,6 +93,7 @@ export default function SlidesPage() {
         subtitulo: form.subtitulo,
         imagem_url: form.imagem_url,
         mostrar_texto: form.mostrar_texto,
+        link_url: form.link_url,
         updated_at: new Date().toISOString(),
       }).eq("id", editing.id);
       if (error) { toast.error("Erro ao atualizar"); return; }
@@ -105,6 +106,7 @@ export default function SlidesPage() {
         subtitulo: form.subtitulo,
         imagem_url: form.imagem_url,
         mostrar_texto: form.mostrar_texto,
+        link_url: form.link_url,
         ordem: maxOrdem,
         pagina: paginaSelecionada,
       });
@@ -243,8 +245,12 @@ export default function SlidesPage() {
               )}
               <Input type="file" accept="image/*" onChange={handleImageUpload} disabled={uploading} />
               {uploading && <p className="text-xs text-muted-foreground mt-1">Enviando...</p>}
-              <p className="text-xs text-muted-foreground mt-1">Ou cole a URL diretamente:</p>
+              <p className="text-xs text-muted-foreground mt-1">Ou cole a URL da imagem diretamente:</p>
               <Input value={form.imagem_url} onChange={(e) => setForm((f) => ({ ...f, imagem_url: e.target.value }))} placeholder="https://..." className="mt-1" />
+            </div>
+            <div>
+              <Label>Link de redirecionamento (opcional)</Label>
+              <Input value={form.link_url} onChange={(e) => setForm((f) => ({ ...f, link_url: e.target.value }))} placeholder="https://exemplo.com (ao clicar na imagem)" />
             </div>
             <Button onClick={handleSave} className="w-full">{editing ? "Salvar Alterações" : "Criar Slide"}</Button>
           </div>
