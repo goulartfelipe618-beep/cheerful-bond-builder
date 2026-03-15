@@ -19,6 +19,10 @@ import {
   ArrowLeft,
   ArrowRight,
   Monitor,
+  Search,
+  Loader2,
+  CheckCircle,
+  XCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
