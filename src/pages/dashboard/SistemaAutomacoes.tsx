@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, Plus, Link2, Copy, ArrowLeft, Sparkles, Save, Code2, Trash2, FlaskConical, Eye, X } from "lucide-react";
+import { RefreshCw, Plus, Link2, Copy, ArrowLeft, Sparkles, Save, Code2, Trash2, FlaskConical, Eye, X, Pencil, ChevronDown, ChevronRight, Check } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -159,6 +159,8 @@ export default function SistemaAutomacoesPage() {
   const [selectedTeste, setSelectedTeste] = useState<WebhookTeste | null>(null);
   // Per-container test selection for Transfer mapping
   const [containerTestes, setContainerTestes] = useState<Record<string, string>>({});
+  // Track which containers are collapsed (saved)
+  const [collapsedContainers, setCollapsedContainers] = useState<Record<string, boolean>>({});
   const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID || "seu-projeto";
 
   const fetchAutomacoes = useCallback(async () => {
@@ -261,7 +263,7 @@ export default function SistemaAutomacoesPage() {
     }));
   };
 
-  const handleSaveMappings = async () => {
+  const handleSaveMappings = async (containerKey?: string) => {
     if (!selected) return;
     const { error } = await supabase
       .from("automacoes")
@@ -270,9 +272,12 @@ export default function SistemaAutomacoesPage() {
     if (error) toast.error("Erro ao salvar");
     else {
       toast.success("Mapeamento salvo com sucesso!");
-      // Update local state
       setAutomacoes((prev) => prev.map((a) => a.id === selected.id ? { ...a, mappings } : a));
       setSelected({ ...selected, mappings });
+      // Collapse the container that was saved
+      if (containerKey) {
+        setCollapsedContainers(prev => ({ ...prev, [containerKey]: true }));
+      }
     }
   };
 
@@ -289,7 +294,7 @@ export default function SistemaAutomacoesPage() {
     return (
       <div className="space-y-6">
         <button
-          onClick={() => { setSelected(null); setMappings({}); setTestes([]); setSelectedTeste(null); setContainerTestes({}); }}
+          onClick={() => { setSelected(null); setMappings({}); setTestes([]); setSelectedTeste(null); setContainerTestes({}); setCollapsedContainers({}); }}
           className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
@@ -444,59 +449,108 @@ export default function SistemaAutomacoesPage() {
           {!selected.ativo && (
             <div className="rounded-xl border border-border bg-card p-6">
               <div className="flex items-center justify-between mb-4">
+              {isTransfer ? (
                 <h3 className="font-semibold text-foreground">Mapeamento de Campos</h3>
-                <Button size="sm" onClick={handleSaveMappings}>
-                  <Save className="h-3.5 w-3.5 mr-1.5" /> Salvar
-                </Button>
+              ) : (
+                <>
+                  <h3 className="font-semibold text-foreground">Mapeamento de Campos</h3>
+                  <Button size="sm" onClick={() => handleSaveMappings("default")}>
+                    <Save className="h-3.5 w-3.5 mr-1.5" /> Salvar
+                  </Button>
+                </>
+              )}
               </div>
               {isTransfer ? (
-                <div className="space-y-6">
+                <div className="space-y-4">
                   {([
                     { key: "somente_ida", label: "Somente Ida" },
                     { key: "ida_volta", label: "Ida e Volta" },
                     { key: "por_hora", label: "Por Hora" },
                   ] as const).map(({ key, label }) => {
+                    const isCollapsed = collapsedContainers[key] === true;
+                    const hasMappings = Object.values(mappings[key] || {}).some(v => v && v.length > 0);
                     const selectedTesteForContainer = testes.find(t => t.id === containerTestes[key]) || null;
                     const availableVars = selectedTesteForContainer ? extractPayloadKeys(selectedTesteForContainer.payload) : [];
                     return (
-                      <div key={key} className="rounded-lg border border-border bg-muted/10 p-4 space-y-4">
+                      <div key={key} className="rounded-lg border border-border bg-muted/10 p-4 space-y-3">
                         <div className="flex items-center justify-between">
-                          <h4 className="text-sm font-semibold text-foreground uppercase">{label}</h4>
+                          <div className="flex items-center gap-2">
+                            {isCollapsed ? <ChevronRight className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
+                            <h4 className="text-sm font-semibold text-foreground uppercase">{label}</h4>
+                            {isCollapsed && hasMappings && (
+                              <Badge variant="secondary" className="ml-2">
+                                <Check className="h-3 w-3 mr-1" /> Salvo
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="flex gap-2">
+                            {isCollapsed ? (
+                              <Button variant="outline" size="sm" onClick={() => setCollapsedContainers(prev => ({ ...prev, [key]: false }))}>
+                                <Pencil className="h-3.5 w-3.5 mr-1.5" /> Editar
+                              </Button>
+                            ) : (
+                              <Button size="sm" onClick={() => handleSaveMappings(key)}>
+                                <Save className="h-3.5 w-3.5 mr-1.5" /> Salvar
+                              </Button>
+                            )}
+                          </div>
                         </div>
-                        <div className="space-y-1">
-                          <Label className="text-xs text-muted-foreground">Qual teste usar de referência?</Label>
-                          <Select
-                            value={containerTestes[key] || ""}
-                            onValueChange={(val) => setContainerTestes(prev => ({ ...prev, [key]: val === "__none__" ? "" : val }))}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Selecione um teste..." />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="__none__">— Nenhum —</SelectItem>
-                              {testes.map((t, idx) => (
-                                <SelectItem key={t.id} value={t.id}>
-                                  Teste {testes.length - idx} — {new Date(t.created_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <FieldMappingList
-                          fields={getFields("transfer", key)}
-                          mappings={mappings[key] || {}}
-                          onUpdate={(f, v) => updateMapping(key, f, v)}
-                          availableVars={availableVars}
-                          testPayload={selectedTesteForContainer?.payload || null}
-                        />
+                        {!isCollapsed && (
+                          <>
+                            <div className="space-y-1">
+                              <Label className="text-xs text-muted-foreground">Qual teste usar de referência?</Label>
+                              <Select
+                                value={containerTestes[key] || ""}
+                                onValueChange={(val) => setContainerTestes(prev => ({ ...prev, [key]: val === "__none__" ? "" : val }))}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Selecione um teste..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="__none__">— Nenhum —</SelectItem>
+                                  {testes.map((t, idx) => (
+                                    <SelectItem key={t.id} value={t.id}>
+                                      Teste {testes.length - idx} — {new Date(t.created_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <FieldMappingList
+                              fields={getFields("transfer", key)}
+                              mappings={mappings[key] || {}}
+                              onUpdate={(f, v) => updateMapping(key, f, v)}
+                              availableVars={availableVars}
+                              testPayload={selectedTesteForContainer?.payload || null}
+                            />
+                          </>
+                        )}
                       </div>
                     );
                   })}
                 </div>
               ) : selected.tipo === "grupo" ? (
-                <FieldMappingList fields={getFields("grupo", "default")} mappings={mappings["default"] || {}} onUpdate={(f, v) => updateMapping("default", f, v)} availableVars={selectedTeste ? extractPayloadKeys(selectedTeste.payload) : []} testPayload={selectedTeste?.payload || null} />
+                !collapsedContainers["default"] ? (
+                  <FieldMappingList fields={getFields("grupo", "default")} mappings={mappings["default"] || {}} onUpdate={(f, v) => updateMapping("default", f, v)} availableVars={selectedTeste ? extractPayloadKeys(selectedTeste.payload) : []} testPayload={selectedTeste?.payload || null} />
+                ) : (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Check className="h-4 w-4 text-primary" /> Mapeamento salvo
+                    <Button variant="outline" size="sm" className="ml-auto" onClick={() => setCollapsedContainers(prev => ({ ...prev, default: false }))}>
+                      <Pencil className="h-3.5 w-3.5 mr-1.5" /> Editar
+                    </Button>
+                  </div>
+                )
               ) : (
-                <FieldMappingList fields={getFields("motorista", "default")} mappings={mappings["default"] || {}} onUpdate={(f, v) => updateMapping("default", f, v)} availableVars={selectedTeste ? extractPayloadKeys(selectedTeste.payload) : []} testPayload={selectedTeste?.payload || null} />
+                !collapsedContainers["default"] ? (
+                  <FieldMappingList fields={getFields("motorista", "default")} mappings={mappings["default"] || {}} onUpdate={(f, v) => updateMapping("default", f, v)} availableVars={selectedTeste ? extractPayloadKeys(selectedTeste.payload) : []} testPayload={selectedTeste?.payload || null} />
+                ) : (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Check className="h-4 w-4 text-primary" /> Mapeamento salvo
+                    <Button variant="outline" size="sm" className="ml-auto" onClick={() => setCollapsedContainers(prev => ({ ...prev, default: false }))}>
+                      <Pencil className="h-3.5 w-3.5 mr-1.5" /> Editar
+                    </Button>
+                  </div>
+                )
               )}
             </div>
           )}
