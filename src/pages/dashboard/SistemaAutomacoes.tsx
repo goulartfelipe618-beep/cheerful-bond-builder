@@ -342,6 +342,20 @@ export default function SistemaAutomacoesPage() {
           </div>
         </div>
 
+        {/* When ACTIVE: show message that data goes to Solicitações */}
+        {selected.ativo && (
+          <div className="rounded-xl border border-green-500/30 bg-green-500/5 p-6 text-center space-y-2">
+            <Sparkles className="h-8 w-8 text-green-500 mx-auto" />
+            <h3 className="font-semibold text-foreground">Webhook em Produção</h3>
+            <p className="text-sm text-muted-foreground">
+              Todos os dados recebidos via webhook estão sendo encaminhados automaticamente para o menu <strong>Solicitações → {tipoLabels[selected.tipo]}</strong>.
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Para receber testes novamente, desative o webhook acima.
+            </p>
+          </div>
+        )}
+
         {/* Side-by-side: Testes (left) + Mapeamento (right) when disabled */}
         <div className={!selected.ativo ? "grid grid-cols-1 lg:grid-cols-2 gap-6 items-start" : ""}>
           {!selected.ativo && (
