@@ -84,7 +84,6 @@ export default function SlidesPage() {
   };
 
   const handleSave = async () => {
-    if (!form.titulo.trim()) { toast.error("Título é obrigatório"); return; }
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
@@ -93,6 +92,7 @@ export default function SlidesPage() {
         titulo: form.titulo,
         subtitulo: form.subtitulo,
         imagem_url: form.imagem_url,
+        mostrar_texto: form.mostrar_texto,
         updated_at: new Date().toISOString(),
       }).eq("id", editing.id);
       if (error) { toast.error("Erro ao atualizar"); return; }
@@ -104,6 +104,7 @@ export default function SlidesPage() {
         titulo: form.titulo,
         subtitulo: form.subtitulo,
         imagem_url: form.imagem_url,
+        mostrar_texto: form.mostrar_texto,
         ordem: maxOrdem,
         pagina: paginaSelecionada,
       });
