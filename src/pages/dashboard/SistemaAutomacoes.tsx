@@ -263,7 +263,7 @@ export default function SistemaAutomacoesPage() {
     }));
   };
 
-  const handleSaveMappings = async () => {
+  const handleSaveMappings = async (containerKey?: string) => {
     if (!selected) return;
     const { error } = await supabase
       .from("automacoes")
@@ -272,9 +272,12 @@ export default function SistemaAutomacoesPage() {
     if (error) toast.error("Erro ao salvar");
     else {
       toast.success("Mapeamento salvo com sucesso!");
-      // Update local state
       setAutomacoes((prev) => prev.map((a) => a.id === selected.id ? { ...a, mappings } : a));
       setSelected({ ...selected, mappings });
+      // Collapse the container that was saved
+      if (containerKey) {
+        setCollapsedContainers(prev => ({ ...prev, [containerKey]: true }));
+      }
     }
   };
 
