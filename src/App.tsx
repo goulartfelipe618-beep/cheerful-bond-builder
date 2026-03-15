@@ -110,7 +110,7 @@ const App = () => (
             <Route path="abrangencia" element={<TaxiAbrangencia />} />
             <Route path="chamadas" element={<TaxiChamadas />} />
             <Route path="atendimentos" element={<TaxiAtendimentos />} />
-            <Route path="clientes-corridas" element={<TaxiClientesCorridas />} />
+            <Route path="clientes" element={<TaxiClientes />} />
             <Route path="anotacoes" element={<AnotacoesPage />} />
             <Route path="sistema/configuracoes" element={<SistemaConfiguracoesPage />} />
             <Route path="sistema/automacoes" element={<SistemaAutomacoesPage />} />
