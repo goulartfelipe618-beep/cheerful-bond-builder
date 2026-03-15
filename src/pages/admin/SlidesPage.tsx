@@ -19,6 +19,7 @@ interface Slide {
   ativo: boolean;
   pagina: string;
   created_at: string;
+  mostrar_texto: boolean;
 }
 
 const PAGINAS = [
