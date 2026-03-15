@@ -71,25 +71,74 @@ function useCamposConfig() {
   return { camposConfig, getFields, loaded };
 }
 
+// Extracts all leaf keys from a nested object as dot-notation paths
+function extractPayloadKeys(obj: Record<string, any>, prefix = ""): string[] {
+  const keys: string[] = [];
+  for (const [key, value] of Object.entries(obj)) {
+    const path = prefix ? `${prefix}.${key}` : key;
+    if (value && typeof value === "object" && !Array.isArray(value)) {
+      keys.push(...extractPayloadKeys(value, path));
+    } else {
+      keys.push(path);
+    }
+  }
+  return keys;
+}
+
+function resolveValue(obj: Record<string, any>, path: string): any {
+  const parts = path.split(".");
+  let current: any = obj;
+  for (const part of parts) {
+    if (current == null) return undefined;
+    current = current[part];
+  }
+  return current;
+}
+
 function FieldMappingList({
   fields,
   mappings,
   onUpdate,
+  availableVars,
+  testPayload,
 }: {
   fields: string[];
   mappings: Record<string, string>;
   onUpdate: (field: string, value: string) => void;
+  availableVars: string[];
+  testPayload: Record<string, any> | null;
 }) {
   return (
     <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-1">
       {fields.map((field) => (
         <div key={field} className="space-y-1">
           <Label className="text-sm font-medium text-foreground">{field}</Label>
-          <Input
-            placeholder="Digite o caminho da variável (ex: nome, dados.email)"
-            value={mappings[field] || ""}
-            onChange={(e) => onUpdate(field, e.target.value)}
-          />
+          {availableVars.length > 0 ? (
+            <Select value={mappings[field] || ""} onValueChange={(val) => onUpdate(field, val === "__clear__" ? "" : val)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione a variável..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="__clear__">— Nenhuma —</SelectItem>
+                {availableVars.map((v) => (
+                  <SelectItem key={v} value={v}>
+                    <span className="font-mono text-xs">{v}</span>
+                    {testPayload && (
+                      <span className="ml-2 text-muted-foreground text-xs">
+                        = {String(resolveValue(testPayload, v) ?? "").substring(0, 40)}
+                      </span>
+                    )}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          ) : (
+            <Input
+              placeholder="Receba um teste primeiro para selecionar variáveis"
+              value={mappings[field] || ""}
+              onChange={(e) => onUpdate(field, e.target.value)}
+            />
+          )}
         </div>
       ))}
     </div>
