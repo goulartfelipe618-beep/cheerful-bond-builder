@@ -245,8 +245,12 @@ export default function SlidesPage() {
               )}
               <Input type="file" accept="image/*" onChange={handleImageUpload} disabled={uploading} />
               {uploading && <p className="text-xs text-muted-foreground mt-1">Enviando...</p>}
-              <p className="text-xs text-muted-foreground mt-1">Ou cole a URL diretamente:</p>
+              <p className="text-xs text-muted-foreground mt-1">Ou cole a URL da imagem diretamente:</p>
               <Input value={form.imagem_url} onChange={(e) => setForm((f) => ({ ...f, imagem_url: e.target.value }))} placeholder="https://..." className="mt-1" />
+            </div>
+            <div>
+              <Label>Link de redirecionamento (opcional)</Label>
+              <Input value={form.link_url} onChange={(e) => setForm((f) => ({ ...f, link_url: e.target.value }))} placeholder="https://exemplo.com (ao clicar na imagem)" />
             </div>
             <Button onClick={handleSave} className="w-full">{editing ? "Salvar Alterações" : "Criar Slide"}</Button>
           </div>
