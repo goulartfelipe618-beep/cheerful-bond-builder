@@ -386,7 +386,7 @@ export default function SistemaAutomacoesPage() {
                       ))}
                     </div>
                     {selectedTeste && (
-                      <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-2">
+                      <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-3">
                         <div className="flex items-center justify-between">
                           <p className="text-xs font-medium text-muted-foreground">
                             Recebido em {new Date(selectedTeste.created_at).toLocaleString("pt-BR")}
@@ -406,9 +406,16 @@ export default function SistemaAutomacoesPage() {
                             </Button>
                           </div>
                         </div>
-                        <pre className="text-xs font-mono bg-background rounded p-3 overflow-x-auto max-h-[300px] overflow-y-auto whitespace-pre-wrap">
-                          {JSON.stringify(selectedTeste.payload, null, 2)}
-                        </pre>
+                        <p className="text-xs text-muted-foreground">Variáveis recebidas:</p>
+                        <div className="flex flex-wrap gap-2 max-h-[300px] overflow-y-auto">
+                          {extractPayloadKeys(selectedTeste.payload).map((key) => (
+                            <div key={key} className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-2.5 py-1.5 text-xs">
+                              <span className="font-mono font-semibold text-primary">{key}</span>
+                              <span className="text-muted-foreground">=</span>
+                              <span className="text-foreground max-w-[120px] truncate">{String(resolveValue(selectedTeste.payload, key) ?? "")}</span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     )}
                   </>
