@@ -106,6 +106,23 @@ export default function WebsitePage() {
     setSelectedFeatures(prev => prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]);
   };
 
+  const handleCheckDomain = async () => {
+    if (!domain.trim()) { toast.error("Informe um domínio"); return; }
+    setCheckingDomain(true);
+    setDomainResult(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("check-domain", {
+        body: { domain: domain.trim() },
+      });
+      if (error) throw error;
+      setDomainResult({ available: data.available, message: data.message });
+    } catch (err: any) {
+      toast.error("Erro ao verificar domínio");
+      setDomainResult({ available: null, message: "Não foi possível verificar. Tente novamente." });
+    }
+    setCheckingDomain(false);
+  };
+
   const selectedTemplateName = dbTemplates.find(t => t.id === selectedTemplate)?.nome || "";
 
   // Fetch templates from DB
