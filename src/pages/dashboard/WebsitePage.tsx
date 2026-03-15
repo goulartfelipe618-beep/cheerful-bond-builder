@@ -78,6 +78,8 @@ export default function WebsitePage() {
   const [domain, setDomain] = useState("");
   const [provider, setProvider] = useState("");
   const [hasDomain, setHasDomain] = useState(false);
+  const [domainResult, setDomainResult] = useState<{ available: boolean | null; message: string } | null>(null);
+  const [checkingDomain, setCheckingDomain] = useState(false);
   const [selectedServices, setSelectedServices] = useState<string[]>(["transfer", "grupos", "excursoes", "corporativo", "aeroporto"]);
   const [companyName, setCompanyName] = useState("");
   const [city, setCity] = useState("");
