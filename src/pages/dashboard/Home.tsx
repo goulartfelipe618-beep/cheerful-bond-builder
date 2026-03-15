@@ -19,40 +19,22 @@ const tools = [
 ];
 
 export default function HomePage() {
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [slides, setSlides] = useState<SlideData[]>(fallbackSlides);
   const [networkAceito, setNetworkAceito] = useState<boolean | null>(null);
   const [mostrarRegras, setMostrarRegras] = useState(false);
 
   useEffect(() => {
-    const fetchSlides = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      const { data } = await supabase
-        .from("slides")
-        .select("id, titulo, subtitulo, imagem_url")
-        .eq("user_id", user.id)
-        .eq("ativo", true)
-        .order("ordem", { ascending: true });
-      if (data && data.length > 0) {
-        setSlides(data as SlideData[]);
-      }
-    };
-
     const checkNetworkStatus = () => {
       const status = localStorage.getItem("network_nacional_aceito");
       const saida = localStorage.getItem("network_saida_data");
       if (status === "sim") {
         setNetworkAceito(true);
       } else if (status === "nao") {
-        // Check if in 60-day cooldown — don't show the invite again
         if (saida) {
           const diff = Date.now() - new Date(saida).getTime();
           const diasPassados = Math.floor(diff / (1000 * 60 * 60 * 24));
           if (diasPassados < 60) {
             setNetworkAceito(false);
           } else {
-            // Cooldown expired, allow re-join
             setNetworkAceito(null);
           }
         } else {
@@ -60,13 +42,8 @@ export default function HomePage() {
         }
       }
     };
-
-    fetchSlides();
     checkNetworkStatus();
   }, []);
-
-  const prevSlide = () => setCurrentSlide((c) => (c > 0 ? c - 1 : slides.length - 1));
-  const nextSlide = () => setCurrentSlide((c) => (c < slides.length - 1 ? c + 1 : 0));
 
   const handleAceitarNetwork = () => {
     setMostrarRegras(true);
