@@ -1,25 +1,10 @@
-import { ChevronLeft, ChevronRight, Mail, Globe, Search, ShoppingCart, Users, BarChart3, Car, ArrowLeftRight, Handshake, ShieldCheck, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { Mail, Globe, Search, ShoppingCart, Users, BarChart3, Car, ArrowLeftRight, Handshake, ShieldCheck, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import luxuryCar from "@/assets/luxury-car.jpg";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-
-interface SlideData {
-  id: string;
-  titulo: string;
-  subtitulo: string;
-  imagem_url: string;
-}
-
-const fallbackSlides: SlideData[] = [
-  {
-    id: "default",
-    titulo: "Impulsione seu Transporte Executivo",
-    subtitulo: "Gerencie sua frota, motoristas e corridas com tecnologia de ponta.",
-    imagem_url: luxuryCar,
-  },
-];
+import SlideCarousel from "@/components/SlideCarousel";
 
 const tools = [
   { icon: Mail, title: "E-mail Profissional", desc: "Crie e-mails corporativos com o domínio da sua empresa para credibilidade total." },
@@ -34,40 +19,22 @@ const tools = [
 ];
 
 export default function HomePage() {
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [slides, setSlides] = useState<SlideData[]>(fallbackSlides);
   const [networkAceito, setNetworkAceito] = useState<boolean | null>(null);
   const [mostrarRegras, setMostrarRegras] = useState(false);
 
   useEffect(() => {
-    const fetchSlides = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      const { data } = await supabase
-        .from("slides")
-        .select("id, titulo, subtitulo, imagem_url")
-        .eq("user_id", user.id)
-        .eq("ativo", true)
-        .order("ordem", { ascending: true });
-      if (data && data.length > 0) {
-        setSlides(data as SlideData[]);
-      }
-    };
-
     const checkNetworkStatus = () => {
       const status = localStorage.getItem("network_nacional_aceito");
       const saida = localStorage.getItem("network_saida_data");
       if (status === "sim") {
         setNetworkAceito(true);
       } else if (status === "nao") {
-        // Check if in 60-day cooldown — don't show the invite again
         if (saida) {
           const diff = Date.now() - new Date(saida).getTime();
           const diasPassados = Math.floor(diff / (1000 * 60 * 60 * 24));
           if (diasPassados < 60) {
             setNetworkAceito(false);
           } else {
-            // Cooldown expired, allow re-join
             setNetworkAceito(null);
           }
         } else {
@@ -75,13 +42,8 @@ export default function HomePage() {
         }
       }
     };
-
-    fetchSlides();
     checkNetworkStatus();
   }, []);
-
-  const prevSlide = () => setCurrentSlide((c) => (c > 0 ? c - 1 : slides.length - 1));
-  const nextSlide = () => setCurrentSlide((c) => (c < slides.length - 1 ? c + 1 : 0));
 
   const handleAceitarNetwork = () => {
     setMostrarRegras(true);
@@ -103,38 +65,14 @@ export default function HomePage() {
   return (
     <div className="space-y-8">
       {/* Hero Carousel */}
-      <div className="relative rounded-xl overflow-hidden h-72">
-        <img
-          src={slides[currentSlide]?.imagem_url || luxuryCar}
-          alt="Banner"
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent flex items-center px-12">
-          <div className="max-w-lg">
-            <h1 className="text-3xl font-bold text-white mb-2">{slides[currentSlide]?.titulo}</h1>
-            <p className="text-white/80">{slides[currentSlide]?.subtitulo}</p>
-          </div>
-        </div>
-        {slides.length > 1 && (
-          <>
-            <button onClick={prevSlide} className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 rounded-full p-2 text-white hover:bg-black/70">
-              <ChevronLeft className="h-5 w-5" />
-            </button>
-            <button onClick={nextSlide} className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 rounded-full p-2 text-white hover:bg-black/70">
-              <ChevronRight className="h-5 w-5" />
-            </button>
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-              {slides.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setCurrentSlide(i)}
-                  className={`h-2.5 w-2.5 rounded-full transition-colors ${i === currentSlide ? 'bg-white' : 'bg-white/40'}`}
-                />
-              ))}
-            </div>
-          </>
-        )}
-      </div>
+      <SlideCarousel
+        pagina="home"
+        fallbackSlides={[{
+          titulo: "Impulsione seu Transporte Executivo",
+          subtitulo: "Gerencie sua frota, motoristas e corridas com tecnologia de ponta.",
+          imagem_url: luxuryCar,
+        }]}
+      />
 
       {/* Network Nacional - Termo */}
       {networkAceito === null && !mostrarRegras && (

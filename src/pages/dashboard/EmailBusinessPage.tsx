@@ -4,18 +4,12 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import {
   Globe, Star, User, CheckCircle2, Mail, Minus, Plus,
-  ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, Sparkles, FileText,
+  ArrowLeft, ArrowRight, Sparkles, FileText,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ExternalLink, Calendar, Info } from "lucide-react";
-
-/* ── data ── */
-const slides = [
-  { title: "Seu E-mail Profissional", description: "Tenha um endereço como contato@suaempresa.com.br e transmita autoridade e credibilidade para hotéis e clientes executivos." },
-  { title: "Destaque-se da Concorrência", description: "Um e-mail profissional mostra que você leva seu negócio a sério. Impressione clientes corporativos e feche mais contratos." },
-  { title: "Integração Total", description: "Sincronize com Google Business, WhatsApp Business e todas as ferramentas do E-Transporte.pro automaticamente." },
-];
+import SlideCarousel from "@/components/SlideCarousel";
 
 const benefits = [
   "Mais autoridade no WhatsApp",
@@ -38,7 +32,6 @@ function fmt(v: number) {
 }
 
 export default function EmailBusinessPage() {
-  const [currentSlide, setCurrentSlide] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [servicoAtivo, setServicoAtivo] = useState<any>(null);
 
@@ -159,17 +152,14 @@ export default function EmailBusinessPage() {
       <div className="space-y-8">
         {pendingBanner}
         {/* Carousel */}
-        <div className="relative rounded-xl overflow-hidden bg-gradient-to-br from-slate-800 to-slate-900 h-80 flex items-center">
-          <Button variant="ghost" size="icon" className="absolute left-2 z-10 bg-background/20 hover:bg-background/40 text-primary-foreground rounded-full" onClick={() => setCurrentSlide((p) => (p === 0 ? slides.length - 1 : p - 1))}><ChevronLeft className="h-5 w-5" /></Button>
-          <div className="px-16 max-w-2xl">
-            <h2 className="text-3xl font-bold text-primary-foreground mb-3">{slides[currentSlide].title}</h2>
-            <p className="text-primary-foreground/80 text-lg">{slides[currentSlide].description}</p>
-          </div>
-          <Button variant="ghost" size="icon" className="absolute right-2 z-10 bg-background/20 hover:bg-background/40 text-primary-foreground rounded-full" onClick={() => setCurrentSlide((p) => (p === slides.length - 1 ? 0 : p + 1))}><ChevronRight className="h-5 w-5" /></Button>
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-            {slides.map((_, i) => (<button key={i} className={`w-2.5 h-2.5 rounded-full ${i === currentSlide ? "bg-primary-foreground" : "bg-primary-foreground/40"}`} onClick={() => setCurrentSlide(i)} />))}
-          </div>
-        </div>
+        <SlideCarousel
+          pagina="email_business"
+          fallbackSlides={[
+            { titulo: "Seu E-mail Profissional", subtitulo: "Tenha um endereço como contato@suaempresa.com.br e transmita autoridade e credibilidade para hotéis e clientes executivos." },
+            { titulo: "Destaque-se da Concorrência", subtitulo: "Um e-mail profissional mostra que você leva seu negócio a sério. Impressione clientes corporativos e feche mais contratos." },
+            { titulo: "Integração Total", subtitulo: "Sincronize com Google Business, WhatsApp Business e todas as ferramentas do E-Transporte.pro automaticamente." },
+          ]}
+        />
 
         <div className="text-center space-y-3">
           <Badge variant="outline" className="gap-2 px-4 py-1.5"><Mail className="h-4 w-4" /> E-mail Business</Badge>
