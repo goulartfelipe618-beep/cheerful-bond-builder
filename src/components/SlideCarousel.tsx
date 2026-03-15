@@ -13,7 +13,7 @@ interface SlideData {
 
 interface SlideCarouselProps {
   pagina: string;
-  fallbackSlides?: { titulo: string; subtitulo: string; imagem_url?: string; mostrar_texto?: boolean }[];
+  fallbackSlides?: { titulo: string; subtitulo: string; imagem_url?: string; mostrar_texto?: boolean; link_url?: string }[];
 }
 
 export default function SlideCarousel({ pagina, fallbackSlides }: SlideCarouselProps) {
