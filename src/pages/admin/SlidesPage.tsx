@@ -19,6 +19,7 @@ interface Slide {
   ativo: boolean;
   pagina: string;
   created_at: string;
+  mostrar_texto: boolean;
 }
 
 const PAGINAS = [
@@ -33,7 +34,7 @@ export default function SlidesPage() {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Slide | null>(null);
-  const [form, setForm] = useState({ titulo: "", subtitulo: "", imagem_url: "" });
+  const [form, setForm] = useState({ titulo: "", subtitulo: "", imagem_url: "", mostrar_texto: false });
   const [uploading, setUploading] = useState(false);
   const [paginaSelecionada, setPaginaSelecionada] = useState("home");
 
@@ -54,13 +55,13 @@ export default function SlidesPage() {
 
   const openCreate = () => {
     setEditing(null);
-    setForm({ titulo: "", subtitulo: "", imagem_url: "" });
+    setForm({ titulo: "", subtitulo: "", imagem_url: "", mostrar_texto: false });
     setDialogOpen(true);
   };
 
   const openEdit = (s: Slide) => {
     setEditing(s);
-    setForm({ titulo: s.titulo, subtitulo: s.subtitulo, imagem_url: s.imagem_url });
+    setForm({ titulo: s.titulo, subtitulo: s.subtitulo, imagem_url: s.imagem_url, mostrar_texto: s.mostrar_texto });
     setDialogOpen(true);
   };
 
@@ -83,7 +84,6 @@ export default function SlidesPage() {
   };
 
   const handleSave = async () => {
-    if (!form.titulo.trim()) { toast.error("Título é obrigatório"); return; }
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
@@ -92,6 +92,7 @@ export default function SlidesPage() {
         titulo: form.titulo,
         subtitulo: form.subtitulo,
         imagem_url: form.imagem_url,
+        mostrar_texto: form.mostrar_texto,
         updated_at: new Date().toISOString(),
       }).eq("id", editing.id);
       if (error) { toast.error("Erro ao atualizar"); return; }
@@ -103,6 +104,7 @@ export default function SlidesPage() {
         titulo: form.titulo,
         subtitulo: form.subtitulo,
         imagem_url: form.imagem_url,
+        mostrar_texto: form.mostrar_texto,
         ordem: maxOrdem,
         pagina: paginaSelecionada,
       });
@@ -218,14 +220,22 @@ export default function SlidesPage() {
             <DialogTitle>{editing ? "Editar Slide" : `Novo Slide — ${paginaAtual?.label}`}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <div>
-              <Label>Título</Label>
-              <Input value={form.titulo} onChange={(e) => setForm((f) => ({ ...f, titulo: e.target.value }))} placeholder="Ex: Impulsione seu Transporte Executivo" />
+            <div className="flex items-center justify-between">
+              <Label>Mostrar textos sobre a imagem</Label>
+              <Switch checked={form.mostrar_texto} onCheckedChange={(v) => setForm((f) => ({ ...f, mostrar_texto: v }))} />
             </div>
-            <div>
-              <Label>Subtítulo</Label>
-              <Input value={form.subtitulo} onChange={(e) => setForm((f) => ({ ...f, subtitulo: e.target.value }))} placeholder="Ex: Gerencie sua frota com tecnologia de ponta" />
-            </div>
+            {form.mostrar_texto && (
+              <>
+                <div>
+                  <Label>Título (opcional)</Label>
+                  <Input value={form.titulo} onChange={(e) => setForm((f) => ({ ...f, titulo: e.target.value }))} placeholder="Ex: Impulsione seu Transporte Executivo" />
+                </div>
+                <div>
+                  <Label>Subtítulo (opcional)</Label>
+                  <Input value={form.subtitulo} onChange={(e) => setForm((f) => ({ ...f, subtitulo: e.target.value }))} placeholder="Ex: Gerencie sua frota com tecnologia de ponta" />
+                </div>
+              </>
+            )}
             <div>
               <Label>Imagem</Label>
               {form.imagem_url && (

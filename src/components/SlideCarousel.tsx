@@ -7,11 +7,12 @@ interface SlideData {
   titulo: string;
   subtitulo: string;
   imagem_url: string;
+  mostrar_texto: boolean;
 }
 
 interface SlideCarouselProps {
   pagina: string;
-  fallbackSlides?: { titulo: string; subtitulo: string; imagem_url?: string }[];
+  fallbackSlides?: { titulo: string; subtitulo: string; imagem_url?: string; mostrar_texto?: boolean }[];
 }
 
 export default function SlideCarousel({ pagina, fallbackSlides }: SlideCarouselProps) {
@@ -23,7 +24,7 @@ export default function SlideCarousel({ pagina, fallbackSlides }: SlideCarouselP
     const fetchSlides = async () => {
       const { data } = await supabase
         .from("slides")
-        .select("id, titulo, subtitulo, imagem_url")
+        .select("id, titulo, subtitulo, imagem_url, mostrar_texto")
         .eq("pagina", pagina)
         .eq("ativo", true)
         .order("ordem", { ascending: true });
@@ -44,7 +45,9 @@ export default function SlideCarousel({ pagina, fallbackSlides }: SlideCarouselP
 
   const prevSlide = () => setCurrentSlide((c) => (c > 0 ? c - 1 : displaySlides.length - 1));
   const nextSlide = () => setCurrentSlide((c) => (c < displaySlides.length - 1 ? c + 1 : 0));
-  const hasImage = !!displaySlides[currentSlide]?.imagem_url;
+  const currentSlideData = displaySlides[currentSlide];
+  const hasImage = !!currentSlideData?.imagem_url;
+  const showText = currentSlideData?.mostrar_texto && (currentSlideData.titulo || currentSlideData.subtitulo);
 
   return (
     <div className="relative rounded-xl overflow-hidden w-full">
@@ -59,17 +62,19 @@ export default function SlideCarousel({ pagina, fallbackSlides }: SlideCarouselP
         <div className="h-72 bg-gradient-to-r from-primary/80 to-primary" />
       )}
 
-      {/* Overlay com texto */}
-      <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent flex items-center px-12">
-        <div className="max-w-lg">
-          {displaySlides[currentSlide].titulo && (
-            <h2 className="text-3xl font-bold text-white mb-2">{displaySlides[currentSlide].titulo}</h2>
-          )}
-          {displaySlides[currentSlide].subtitulo && (
-            <p className="text-white/80">{displaySlides[currentSlide].subtitulo}</p>
-          )}
+      {/* Overlay com texto — só aparece se mostrar_texto estiver ativo */}
+      {showText && (
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent flex items-center px-12">
+          <div className="max-w-lg">
+            {currentSlideData.titulo && (
+              <h2 className="text-3xl font-bold text-white mb-2">{currentSlideData.titulo}</h2>
+            )}
+            {currentSlideData.subtitulo && (
+              <p className="text-white/80">{currentSlideData.subtitulo}</p>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Navegação */}
       {displaySlides.length > 1 && (
