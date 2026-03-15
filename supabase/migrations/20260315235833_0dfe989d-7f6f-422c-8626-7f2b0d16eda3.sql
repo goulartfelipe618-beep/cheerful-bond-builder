@@ -1,0 +1,1 @@
+ALTER TABLE public.slides ADD COLUMN link_url text DEFAULT '';
