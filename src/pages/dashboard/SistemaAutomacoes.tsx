@@ -157,6 +157,8 @@ export default function SistemaAutomacoesPage() {
   const [loading, setLoading] = useState(true);
   const [testes, setTestes] = useState<WebhookTeste[]>([]);
   const [selectedTeste, setSelectedTeste] = useState<WebhookTeste | null>(null);
+  // Per-container test selection for Transfer mapping
+  const [containerTestes, setContainerTestes] = useState<Record<string, string>>({});
   const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID || "seu-projeto";
 
   const fetchAutomacoes = useCallback(async () => {
