@@ -537,6 +537,7 @@ export type Database = {
           id: string
           imagem_url: string
           ordem: number
+          pagina: string
           subtitulo: string
           titulo: string
           updated_at: string
@@ -548,6 +549,7 @@ export type Database = {
           id?: string
           imagem_url?: string
           ordem?: number
+          pagina?: string
           subtitulo?: string
           titulo?: string
           updated_at?: string
@@ -559,6 +561,7 @@ export type Database = {
           id?: string
           imagem_url?: string
           ordem?: number
+          pagina?: string
           subtitulo?: string
           titulo?: string
           updated_at?: string
