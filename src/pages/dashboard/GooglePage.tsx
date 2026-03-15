@@ -95,11 +95,6 @@ export default function GooglePage() {
     setOpen(false);
   };
 
-  const slides = [
-    { title: "Coloque Sua Empresa no Google", description: "Crie seu perfil no Google Business Profile e apareça nas buscas quando clientes procurarem por transporte executivo na sua região." },
-    { title: "Perfil Verificado no Google", description: "Motoristas com perfil verificado passam mais confiança. Hotéis e empresas encontram você diretamente no Google Maps." },
-    { title: "Aumente Sua Visibilidade", description: "Destaque-se nos resultados de busca com avaliações positivas e informações completas do seu serviço." },
-  ];
 
   const isLast = tabIndex === TABS.length - 1;
 
