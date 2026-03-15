@@ -220,14 +220,22 @@ export default function SlidesPage() {
             <DialogTitle>{editing ? "Editar Slide" : `Novo Slide — ${paginaAtual?.label}`}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <div>
-              <Label>Título</Label>
-              <Input value={form.titulo} onChange={(e) => setForm((f) => ({ ...f, titulo: e.target.value }))} placeholder="Ex: Impulsione seu Transporte Executivo" />
+            <div className="flex items-center justify-between">
+              <Label>Mostrar textos sobre a imagem</Label>
+              <Switch checked={form.mostrar_texto} onCheckedChange={(v) => setForm((f) => ({ ...f, mostrar_texto: v }))} />
             </div>
-            <div>
-              <Label>Subtítulo</Label>
-              <Input value={form.subtitulo} onChange={(e) => setForm((f) => ({ ...f, subtitulo: e.target.value }))} placeholder="Ex: Gerencie sua frota com tecnologia de ponta" />
-            </div>
+            {form.mostrar_texto && (
+              <>
+                <div>
+                  <Label>Título (opcional)</Label>
+                  <Input value={form.titulo} onChange={(e) => setForm((f) => ({ ...f, titulo: e.target.value }))} placeholder="Ex: Impulsione seu Transporte Executivo" />
+                </div>
+                <div>
+                  <Label>Subtítulo (opcional)</Label>
+                  <Input value={form.subtitulo} onChange={(e) => setForm((f) => ({ ...f, subtitulo: e.target.value }))} placeholder="Ex: Gerencie sua frota com tecnologia de ponta" />
+                </div>
+              </>
+            )}
             <div>
               <Label>Imagem</Label>
               {form.imagem_url && (

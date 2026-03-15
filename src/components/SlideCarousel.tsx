@@ -62,17 +62,19 @@ export default function SlideCarousel({ pagina, fallbackSlides }: SlideCarouselP
         <div className="h-72 bg-gradient-to-r from-primary/80 to-primary" />
       )}
 
-      {/* Overlay com texto */}
-      <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent flex items-center px-12">
-        <div className="max-w-lg">
-          {displaySlides[currentSlide].titulo && (
-            <h2 className="text-3xl font-bold text-white mb-2">{displaySlides[currentSlide].titulo}</h2>
-          )}
-          {displaySlides[currentSlide].subtitulo && (
-            <p className="text-white/80">{displaySlides[currentSlide].subtitulo}</p>
-          )}
+      {/* Overlay com texto — só aparece se mostrar_texto estiver ativo */}
+      {showText && (
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent flex items-center px-12">
+          <div className="max-w-lg">
+            {currentSlideData.titulo && (
+              <h2 className="text-3xl font-bold text-white mb-2">{currentSlideData.titulo}</h2>
+            )}
+            {currentSlideData.subtitulo && (
+              <p className="text-white/80">{currentSlideData.subtitulo}</p>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Navegação */}
       {displaySlides.length > 1 && (
