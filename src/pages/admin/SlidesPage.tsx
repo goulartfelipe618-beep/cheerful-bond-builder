@@ -34,7 +34,7 @@ export default function SlidesPage() {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Slide | null>(null);
-  const [form, setForm] = useState({ titulo: "", subtitulo: "", imagem_url: "" });
+  const [form, setForm] = useState({ titulo: "", subtitulo: "", imagem_url: "", mostrar_texto: false });
   const [uploading, setUploading] = useState(false);
   const [paginaSelecionada, setPaginaSelecionada] = useState("home");
 
