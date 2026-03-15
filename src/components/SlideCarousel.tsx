@@ -45,7 +45,9 @@ export default function SlideCarousel({ pagina, fallbackSlides }: SlideCarouselP
 
   const prevSlide = () => setCurrentSlide((c) => (c > 0 ? c - 1 : displaySlides.length - 1));
   const nextSlide = () => setCurrentSlide((c) => (c < displaySlides.length - 1 ? c + 1 : 0));
-  const hasImage = !!displaySlides[currentSlide]?.imagem_url;
+  const currentSlideData = displaySlides[currentSlide];
+  const hasImage = !!currentSlideData?.imagem_url;
+  const showText = currentSlideData?.mostrar_texto && (currentSlideData.titulo || currentSlideData.subtitulo);
 
   return (
     <div className="relative rounded-xl overflow-hidden w-full">
