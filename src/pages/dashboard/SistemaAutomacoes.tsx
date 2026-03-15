@@ -321,17 +321,17 @@ export default function SistemaAutomacoesPage() {
 
           <div className="flex items-center justify-between border-t border-border pt-4">
             <div className="flex items-center gap-3">
-              <div className="rounded-full bg-muted p-2">
-                <RefreshCw className="h-4 w-4 text-muted-foreground" />
+              <div className={`rounded-full p-2 ${selected.ativo ? "bg-green-500/10" : "bg-muted"}`}>
+                <RefreshCw className={`h-4 w-4 ${selected.ativo ? "text-green-500" : "text-muted-foreground"}`} />
               </div>
               <div>
                 <p className="text-sm font-medium text-foreground">
-                  Webhook {selected.ativo ? "Ativado" : "Desativado"}
+                  {selected.ativo ? "🟢 Webhook Ativado — Modo Produção" : "🔴 Webhook Desativado — Modo Teste"}
                 </p>
                 <p className="text-xs text-muted-foreground">
                   {selected.ativo
-                    ? "Dados recebidos serão enviados para Solicitações automaticamente."
-                    : "Webhook desativado. Ative para começar a receber dados."}
+                    ? `Dados recebidos serão encaminhados automaticamente para o menu Solicitações de ${tipoLabels[selected.tipo] || selected.tipo}. Testes NÃO serão armazenados.`
+                    : "Envie um POST para a URL acima para receber testes. Configure o mapeamento antes de ativar."}
                 </p>
               </div>
             </div>
@@ -341,6 +341,20 @@ export default function SistemaAutomacoesPage() {
             />
           </div>
         </div>
+
+        {/* When ACTIVE: show message that data goes to Solicitações */}
+        {selected.ativo && (
+          <div className="rounded-xl border border-green-500/30 bg-green-500/5 p-6 text-center space-y-2">
+            <Sparkles className="h-8 w-8 text-green-500 mx-auto" />
+            <h3 className="font-semibold text-foreground">Webhook em Produção</h3>
+            <p className="text-sm text-muted-foreground">
+              Todos os dados recebidos via webhook estão sendo encaminhados automaticamente para o menu <strong>Solicitações → {tipoLabels[selected.tipo]}</strong>.
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Para receber testes novamente, desative o webhook acima.
+            </p>
+          </div>
+        )}
 
         {/* Side-by-side: Testes (left) + Mapeamento (right) when disabled */}
         <div className={!selected.ativo ? "grid grid-cols-1 lg:grid-cols-2 gap-6 items-start" : ""}>
@@ -424,37 +438,39 @@ export default function SistemaAutomacoesPage() {
             </div>
           )}
 
-          {/* Mapeamento de Campos */}
-          <div className="rounded-xl border border-border bg-card p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-foreground">Mapeamento de Campos</h3>
-              <Button size="sm" onClick={handleSaveMappings}>
-                <Save className="h-3.5 w-3.5 mr-1.5" /> Salvar
-              </Button>
+          {/* Mapeamento de Campos - only when disabled */}
+          {!selected.ativo && (
+            <div className="rounded-xl border border-border bg-card p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold text-foreground">Mapeamento de Campos</h3>
+                <Button size="sm" onClick={handleSaveMappings}>
+                  <Save className="h-3.5 w-3.5 mr-1.5" /> Salvar
+                </Button>
+              </div>
+              {isTransfer ? (
+                <Tabs defaultValue="somente_ida">
+                  <TabsList className="w-full grid grid-cols-3 mb-4">
+                    <TabsTrigger value="somente_ida">Somente Ida</TabsTrigger>
+                    <TabsTrigger value="ida_volta">Ida e Volta</TabsTrigger>
+                    <TabsTrigger value="por_hora">Por Hora</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="somente_ida">
+                    <FieldMappingList fields={getFields("transfer", "somente_ida")} mappings={mappings["somente_ida"] || {}} onUpdate={(f, v) => updateMapping("somente_ida", f, v)} availableVars={selectedTeste ? extractPayloadKeys(selectedTeste.payload) : []} testPayload={selectedTeste?.payload || null} />
+                  </TabsContent>
+                  <TabsContent value="ida_volta">
+                    <FieldMappingList fields={getFields("transfer", "ida_volta")} mappings={mappings["ida_volta"] || {}} onUpdate={(f, v) => updateMapping("ida_volta", f, v)} availableVars={selectedTeste ? extractPayloadKeys(selectedTeste.payload) : []} testPayload={selectedTeste?.payload || null} />
+                  </TabsContent>
+                  <TabsContent value="por_hora">
+                    <FieldMappingList fields={getFields("transfer", "por_hora")} mappings={mappings["por_hora"] || {}} onUpdate={(f, v) => updateMapping("por_hora", f, v)} availableVars={selectedTeste ? extractPayloadKeys(selectedTeste.payload) : []} testPayload={selectedTeste?.payload || null} />
+                  </TabsContent>
+                </Tabs>
+              ) : selected.tipo === "grupo" ? (
+                <FieldMappingList fields={getFields("grupo", "default")} mappings={mappings["default"] || {}} onUpdate={(f, v) => updateMapping("default", f, v)} availableVars={selectedTeste ? extractPayloadKeys(selectedTeste.payload) : []} testPayload={selectedTeste?.payload || null} />
+              ) : (
+                <FieldMappingList fields={getFields("motorista", "default")} mappings={mappings["default"] || {}} onUpdate={(f, v) => updateMapping("default", f, v)} availableVars={selectedTeste ? extractPayloadKeys(selectedTeste.payload) : []} testPayload={selectedTeste?.payload || null} />
+              )}
             </div>
-            {isTransfer ? (
-              <Tabs defaultValue="somente_ida">
-                <TabsList className="w-full grid grid-cols-3 mb-4">
-                  <TabsTrigger value="somente_ida">Somente Ida</TabsTrigger>
-                  <TabsTrigger value="ida_volta">Ida e Volta</TabsTrigger>
-                  <TabsTrigger value="por_hora">Por Hora</TabsTrigger>
-                </TabsList>
-                <TabsContent value="somente_ida">
-                  <FieldMappingList fields={getFields("transfer", "somente_ida")} mappings={mappings["somente_ida"] || {}} onUpdate={(f, v) => updateMapping("somente_ida", f, v)} availableVars={selectedTeste ? extractPayloadKeys(selectedTeste.payload) : []} testPayload={selectedTeste?.payload || null} />
-                </TabsContent>
-                <TabsContent value="ida_volta">
-                  <FieldMappingList fields={getFields("transfer", "ida_volta")} mappings={mappings["ida_volta"] || {}} onUpdate={(f, v) => updateMapping("ida_volta", f, v)} availableVars={selectedTeste ? extractPayloadKeys(selectedTeste.payload) : []} testPayload={selectedTeste?.payload || null} />
-                </TabsContent>
-                <TabsContent value="por_hora">
-                  <FieldMappingList fields={getFields("transfer", "por_hora")} mappings={mappings["por_hora"] || {}} onUpdate={(f, v) => updateMapping("por_hora", f, v)} availableVars={selectedTeste ? extractPayloadKeys(selectedTeste.payload) : []} testPayload={selectedTeste?.payload || null} />
-                </TabsContent>
-              </Tabs>
-            ) : selected.tipo === "grupo" ? (
-              <FieldMappingList fields={getFields("grupo", "default")} mappings={mappings["default"] || {}} onUpdate={(f, v) => updateMapping("default", f, v)} availableVars={selectedTeste ? extractPayloadKeys(selectedTeste.payload) : []} testPayload={selectedTeste?.payload || null} />
-            ) : (
-              <FieldMappingList fields={getFields("motorista", "default")} mappings={mappings["default"] || {}} onUpdate={(f, v) => updateMapping("default", f, v)} availableVars={selectedTeste ? extractPayloadKeys(selectedTeste.payload) : []} testPayload={selectedTeste?.payload || null} />
-            )}
-          </div>
+          )}
         </div>
 
         <FerramentasDevDialog
