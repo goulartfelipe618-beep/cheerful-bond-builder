@@ -19,6 +19,10 @@ import {
   ArrowLeft,
   ArrowRight,
   Monitor,
+  Search,
+  Loader2,
+  CheckCircle,
+  XCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
@@ -74,6 +78,8 @@ export default function WebsitePage() {
   const [domain, setDomain] = useState("");
   const [provider, setProvider] = useState("");
   const [hasDomain, setHasDomain] = useState(false);
+  const [domainResult, setDomainResult] = useState<{ available: boolean | null; message: string } | null>(null);
+  const [checkingDomain, setCheckingDomain] = useState(false);
   const [selectedServices, setSelectedServices] = useState<string[]>(["transfer", "grupos", "excursoes", "corporativo", "aeroporto"]);
   const [companyName, setCompanyName] = useState("");
   const [city, setCity] = useState("");
@@ -98,6 +104,23 @@ export default function WebsitePage() {
   };
   const toggleFeature = (id: string) => {
     setSelectedFeatures(prev => prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]);
+  };
+
+  const handleCheckDomain = async () => {
+    if (!domain.trim()) { toast.error("Informe um domínio"); return; }
+    setCheckingDomain(true);
+    setDomainResult(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("check-domain", {
+        body: { domain: domain.trim() },
+      });
+      if (error) throw error;
+      setDomainResult({ available: data.available, message: data.message });
+    } catch (err: any) {
+      toast.error("Erro ao verificar domínio");
+      setDomainResult({ available: null, message: "Não foi possível verificar. Tente novamente." });
+    }
+    setCheckingDomain(false);
   };
 
   const selectedTemplateName = dbTemplates.find(t => t.id === selectedTemplate)?.nome || "";
@@ -261,26 +284,87 @@ export default function WebsitePage() {
         </div>
 
         {/* Step 1: Domain */}
-        {briefingStep === 1 && (
+         {briefingStep === 1 && (
           <div className="rounded-xl border border-border bg-card p-6 space-y-6">
             <div className="flex items-center gap-2">
               <Globe className="h-5 w-5 text-foreground" />
-              <h2 className="text-lg font-bold text-foreground">Domínio Desejado</h2>
+              <h2 className="text-lg font-bold text-foreground">Escolha seu domínio</h2>
             </div>
-            <p className="text-sm text-muted-foreground">Informe o domínio que deseja para seu site. Nós verificaremos a disponibilidade e entraremos em contato.</p>
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-foreground">Você já tem um domínio?</p>
+              <div className="flex items-center gap-6">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" checked={!hasDomain} onChange={() => { setHasDomain(false); setDomainResult(null); }} className="accent-primary" />
+                  <span className="text-sm text-foreground">Quero registrar um novo</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" checked={hasDomain} onChange={() => { setHasDomain(true); setDomainResult(null); }} className="accent-primary" />
+                  <span className="text-sm text-foreground">Já tenho um domínio</span>
+                </label>
+              </div>
+            </div>
+
             <div className="space-y-4">
               <div>
-                <label className="text-sm font-medium text-foreground">Domínio desejado <span className="text-destructive">*</span></label>
-                <Input value={domain} onChange={e => setDomain(e.target.value)} placeholder="www.seudominio.com.br" className="mt-1" />
+                <label className="text-sm font-medium text-foreground">
+                  {hasDomain ? "Seu domínio atual" : "Nome desejado para o domínio"}
+                </label>
+                <Input
+                  value={domain}
+                  onChange={e => { setDomain(e.target.value); setDomainResult(null); }}
+                  placeholder={hasDomain ? "meudominio.com.br" : "suaempresa.com.br"}
+                  className="mt-1"
+                />
+                {!hasDomain && (
+                  <p className="text-xs text-muted-foreground mt-1">Pesquise a disponibilidade antes de continuar.</p>
+                )}
               </div>
-              <div>
-                <label className="text-sm font-medium text-foreground">Provedor atual (se já possui domínio)</label>
-                <Input value={provider} onChange={e => setProvider(e.target.value)} placeholder="Hostinger, GoDaddy, etc." className="mt-1" />
-              </div>
-              <div className="flex items-center gap-2">
-                <Checkbox checked={hasDomain} onCheckedChange={(v) => setHasDomain(!!v)} />
-                <span className="text-sm text-foreground">Já possuo este domínio e tenho acesso ao DNS</span>
-              </div>
+
+              {!hasDomain && (
+                <Button
+                  variant="outline"
+                  onClick={handleCheckDomain}
+                  disabled={checkingDomain || !domain.trim()}
+                >
+                  {checkingDomain ? (
+                    <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Verificando...</>
+                  ) : (
+                    <><Globe className="h-4 w-4 mr-2" /> Pesquisar Domínio</>
+                  )}
+                </Button>
+              )}
+
+              {domainResult && (
+                <div className={cn(
+                  "rounded-lg border p-4 flex items-start gap-3",
+                  domainResult.available === true && "border-green-500/30 bg-green-500/10",
+                  domainResult.available === false && "border-destructive/30 bg-destructive/10",
+                  domainResult.available === null && "border-border bg-muted/30",
+                )}>
+                  {domainResult.available === true && <CheckCircle className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />}
+                  {domainResult.available === false && <XCircle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />}
+                  {domainResult.available === null && <Globe className="h-5 w-5 text-muted-foreground shrink-0 mt-0.5" />}
+                  <div>
+                    <p className={cn(
+                      "text-sm font-semibold",
+                      domainResult.available === true && "text-green-500",
+                      domainResult.available === false && "text-destructive",
+                    )}>
+                      {domainResult.message}
+                    </p>
+                    {domainResult.available === false && (
+                      <p className="text-xs text-muted-foreground mt-1">Tente outro nome ou variação.</p>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {hasDomain && (
+                <div>
+                  <label className="text-sm font-medium text-foreground">Provedor atual</label>
+                  <Input value={provider} onChange={e => setProvider(e.target.value)} placeholder="Hostinger, GoDaddy, Registro.br, etc." className="mt-1" />
+                </div>
+              )}
             </div>
           </div>
         )}
