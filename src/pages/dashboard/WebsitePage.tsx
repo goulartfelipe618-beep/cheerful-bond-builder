@@ -500,24 +500,14 @@ export default function WebsitePage() {
     <div className="space-y-6">
       {pendingBanner}
       {/* Hero Carousel */}
-      <div className="relative rounded-xl overflow-hidden h-72 bg-gradient-to-r from-neutral-900 to-neutral-700">
-        <div className="absolute inset-0 flex flex-col justify-end p-8">
-          <p className="text-xs uppercase tracking-widest text-neutral-400 mb-1">Professional Executive Transportation</p>
-          <h2 className="text-2xl font-bold text-white">{heroSlides[heroIndex].title}</h2>
-          <p className="text-sm text-neutral-300 mt-1 max-w-lg">{heroSlides[heroIndex].desc}</p>
-        </div>
-        <button onClick={() => setHeroIndex((heroIndex - 1 + heroSlides.length) % heroSlides.length)} className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70">
-          <ChevronLeft className="h-4 w-4" />
-        </button>
-        <button onClick={() => setHeroIndex((heroIndex + 1) % heroSlides.length)} className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70">
-          <ChevronRight className="h-4 w-4" />
-        </button>
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-          {heroSlides.map((_, i) => (
-            <button key={i} onClick={() => setHeroIndex(i)} className={cn("w-2.5 h-2.5 rounded-full", i === heroIndex ? "bg-white" : "bg-white/40")} />
-          ))}
-        </div>
-      </div>
+      <SlideCarousel
+        pagina="website"
+        fallbackSlides={[
+          { titulo: "Crie Seu Site Profissional", subtitulo: "Tenha presença online com um site exclusivo para transporte executivo. Design premium e responsivo." },
+          { titulo: "Templates Exclusivos", subtitulo: "Escolha entre diversos modelos desenvolvidos especialmente para o segmento de transporte executivo." },
+          { titulo: "100% Personalizado", subtitulo: "Cores, textos e funcionalidades sob medida para sua empresa." },
+        ]}
+      />
 
       {/* Title */}
       <div>
