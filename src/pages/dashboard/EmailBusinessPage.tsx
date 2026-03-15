@@ -4,18 +4,12 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import {
   Globe, Star, User, CheckCircle2, Mail, Minus, Plus,
-  ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, Sparkles, FileText,
+  ArrowLeft, ArrowRight, Sparkles, FileText,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ExternalLink, Calendar, Info } from "lucide-react";
-
-/* ── data ── */
-const slides = [
-  { title: "Seu E-mail Profissional", description: "Tenha um endereço como contato@suaempresa.com.br e transmita autoridade e credibilidade para hotéis e clientes executivos." },
-  { title: "Destaque-se da Concorrência", description: "Um e-mail profissional mostra que você leva seu negócio a sério. Impressione clientes corporativos e feche mais contratos." },
-  { title: "Integração Total", description: "Sincronize com Google Business, WhatsApp Business e todas as ferramentas do E-Transporte.pro automaticamente." },
-];
+import SlideCarousel from "@/components/SlideCarousel";
 
 const benefits = [
   "Mais autoridade no WhatsApp",
