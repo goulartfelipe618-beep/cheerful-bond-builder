@@ -32,7 +32,6 @@ const DAYS = [
 ];
 
 export default function GooglePage() {
-  const [currentSlide, setCurrentSlide] = useState(0);
   const [open, setOpen] = useState(false);
   const [tabIndex, setTabIndex] = useState(0);
   const [descLen, setDescLen] = useState(0);
