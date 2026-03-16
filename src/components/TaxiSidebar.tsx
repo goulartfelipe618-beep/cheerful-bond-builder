@@ -3,8 +3,7 @@ import {
   Phone, CheckCircle, Users, Settings, StickyNote,
   Bell, Moon, LogOut, Globe, Monitor,
 } from "lucide-react";
-import { NavLink } from "@/components/NavLink";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
@@ -18,6 +17,7 @@ import {
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useConfiguracoes } from "@/contexts/ConfiguracoesContext";
+import { useActivePage } from "@/contexts/ActivePageContext";
 
 const menuStructure = [
   {
@@ -27,18 +27,18 @@ const menuStructure = [
         title: "Painel",
         icon: LayoutDashboard,
         children: [
-          { title: "Home", url: "/taxi", icon: Home },
-          { title: "Métricas", url: "/taxi/metricas", icon: Activity },
-          { title: "Abrangência", url: "/taxi/abrangencia", icon: MapPin },
+          { title: "Home", page: "home", icon: Home },
+          { title: "Métricas", page: "metricas", icon: Activity },
+          { title: "Abrangência", page: "abrangencia", icon: MapPin },
         ],
       },
       {
         title: "Taxi",
         icon: Car,
         children: [
-          { title: "Chamadas", url: "/taxi/chamadas", icon: Phone },
-          { title: "Atendimentos", url: "/taxi/atendimentos", icon: CheckCircle },
-          { title: "Clientes", url: "/taxi/clientes", icon: Users },
+          { title: "Chamadas", page: "chamadas", icon: Phone },
+          { title: "Atendimentos", page: "atendimentos", icon: CheckCircle },
+          { title: "Clientes", page: "clientes", icon: Users },
         ],
       },
     ],
@@ -50,12 +50,12 @@ const menuStructure = [
         title: "Sistema",
         icon: Settings,
         children: [
-          { title: "Configurações", url: "/taxi/sistema/configuracoes", icon: Settings },
-          { title: "Automações", url: "/taxi/sistema/automacoes", icon: Globe },
-          { title: "Comunicador", url: "/taxi/sistema/comunicador", icon: Monitor },
+          { title: "Configurações", page: "sistema/configuracoes", icon: Settings },
+          { title: "Automações", page: "sistema/automacoes", icon: Globe },
+          { title: "Comunicador", page: "sistema/comunicador", icon: Monitor },
         ],
       },
-      { title: "Anotações", url: "/taxi/anotacoes", icon: StickyNote },
+      { title: "Anotações", page: "anotacoes", icon: StickyNote },
     ],
   },
 ];
@@ -63,17 +63,17 @@ const menuStructure = [
 export function TaxiSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
-  const location = useLocation();
   const navigate = useNavigate();
   const { config } = useConfiguracoes();
+  const { activePage, setActivePage } = useActivePage();
 
-  const isActive = (url: string) => location.pathname === url;
-  const isGroupActive = (children: { url: string }[]) =>
-    children.some((c) => location.pathname === c.url);
+  const isActive = (page: string) => activePage === page;
+  const isGroupActive = (children: { page: string }[]) =>
+    children.some((c) => activePage === c.page);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    navigate("/");
+    navigate("/login");
   };
 
   return (
@@ -118,17 +118,16 @@ export function TaxiSidebar() {
                           <CollapsibleContent>
                             <SidebarMenuSub>
                               {item.children.map((child) => (
-                                <SidebarMenuSubItem key={child.url}>
-                                  <SidebarMenuSubButton asChild>
-                                    <NavLink
-                                      to={child.url}
-                                      end
-                                      className="text-sm"
-                                      activeClassName="text-primary font-medium"
-                                    >
-                                      <child.icon className="h-3.5 w-3.5 mr-2" />
-                                      {child.title}
-                                    </NavLink>
+                                <SidebarMenuSubItem key={child.page}>
+                                  <SidebarMenuSubButton
+                                    onClick={() => setActivePage(child.page)}
+                                    className={cn(
+                                      "text-sm cursor-pointer w-full",
+                                      isActive(child.page) && "text-primary font-medium"
+                                    )}
+                                  >
+                                    <child.icon className="h-3.5 w-3.5 mr-2" />
+                                    {child.title}
                                   </SidebarMenuSubButton>
                                 </SidebarMenuSubItem>
                               ))}
@@ -139,19 +138,18 @@ export function TaxiSidebar() {
                     );
                   }
 
-                  const url = (item as { url: string }).url;
+                  const page = (item as { page: string }).page;
                   return (
                     <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton asChild>
-                        <NavLink
-                          to={url}
-                          end
-                          className="hover:bg-muted/50"
-                          activeClassName="bg-muted text-primary font-medium"
-                        >
-                          <item.icon className="h-4 w-4 mr-2" />
-                          {!collapsed && <span>{item.title}</span>}
-                        </NavLink>
+                      <SidebarMenuButton
+                        onClick={() => setActivePage(page)}
+                        className={cn(
+                          "cursor-pointer",
+                          isActive(page) && "bg-muted text-primary font-medium"
+                        )}
+                      >
+                        <item.icon className="h-4 w-4 mr-2" />
+                        {!collapsed && <span>{item.title}</span>}
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   );
