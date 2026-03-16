@@ -34,6 +34,7 @@ import SistemaConfiguracoesPage from "@/pages/dashboard/SistemaConfiguracoes";
 import SistemaAutomacoesPage from "@/pages/dashboard/SistemaAutomacoes";
 import SistemaComunicadorPage from "@/pages/dashboard/SistemaComunicador";
 import TicketsPage from "@/pages/dashboard/TicketsPage";
+import DisparadorPage from "@/pages/dashboard/DisparadorPage";
 
 const PAGE_MAP: Record<string, React.ComponentType> = {
   home: HomePage,
