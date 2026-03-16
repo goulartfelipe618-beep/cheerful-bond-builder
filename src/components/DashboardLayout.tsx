@@ -65,6 +65,7 @@ const PAGE_MAP: Record<string, React.ComponentType> = {
   "sistema/automacoes": SistemaAutomacoesPage,
   "sistema/comunicador": SistemaComunicadorPage,
   tickets: TicketsPage,
+  disparador: DisparadorPage,
 };
 
 function DashboardContent() {

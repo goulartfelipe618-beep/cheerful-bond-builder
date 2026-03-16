@@ -83,6 +83,7 @@ const getMenuStructure = (showNetwork: boolean) => [
       { title: "Google", page: "google", icon: Search },
       { title: "E-mail Business", page: "email-business", icon: Mail },
       { title: "Website", page: "website", icon: Monitor },
+      { title: "Disparador", page: "disparador", icon: Megaphone },
     ],
   },
   {
