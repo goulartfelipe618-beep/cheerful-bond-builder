@@ -168,8 +168,77 @@ export default function MentoriaPage() {
           <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
             <BookOpen className="h-5 w-5 text-primary" /> Sobre o Sistema
           </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-            {sobreCards.map((card, index) => (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
+            {(showAllSobre ? sobreCards : sobreCards.slice(0, 4)).map((card, index) => (
+              <button key={card.id} onClick={() => openCard(card)} className="group block text-left w-full">
+                <Card className="overflow-hidden border-border hover:border-primary/50 transition-all duration-300 hover:-translate-y-1 relative">
+                  {progresso[card.id] && (
+                    <div className="absolute top-2 left-2 z-10">
+                      <Badge className="bg-emerald-600 text-white text-[10px] gap-1 px-1.5 py-0.5">
+                        <CheckCircle2 className="h-3 w-3" />
+                      </Badge>
+                    </div>
+                  )}
+                  <div style={{ aspectRatio: "16/10" }}>
+                    <img src={card.imagem_url} alt={card.titulo} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                  </div>
+                  <div className="p-3 space-y-1">
+                    <p className="text-[10px] text-primary font-semibold">Vídeo {index + 1}</p>
+                    <p className="text-foreground text-xs sm:text-sm font-bold leading-tight line-clamp-2">{card.titulo}</p>
+                    {card.descricao && <p className="text-muted-foreground text-[10px] sm:text-xs line-clamp-1">{card.descricao}</p>}
+                  </div>
+                </Card>
+              </button>
+            ))}
+          </div>
+          {sobreCards.length > 4 && (
+            <div className="flex justify-center">
+              <Button variant="outline" onClick={() => setShowAllSobre(!showAllSobre)}>
+                {showAllSobre ? "Ver menos" : "VER TUDO!"}
+              </Button>
+            </div>
+          )}
+        </section>
+      )}
+
+      {/* Conteúdos */}
+      {conteudoCards.length > 0 && (
+        <section className="space-y-4">
+          <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
+            <GraduationCap className="h-5 w-5 text-primary" /> Conteúdos
+          </h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
+            {(showAllConteudo ? conteudoCards : conteudoCards.slice(0, 4)).map((card, index) => (
+              <button key={card.id} onClick={() => openCard(card)} className="group block text-left w-full">
+                <Card className="overflow-hidden border-border hover:border-primary/50 transition-all duration-300 hover:-translate-y-1 relative">
+                  {progresso[card.id] && (
+                    <div className="absolute top-2 left-2 z-10">
+                      <Badge className="bg-emerald-600 text-white text-[10px] gap-1 px-1.5 py-0.5">
+                        <CheckCircle2 className="h-3 w-3" />
+                      </Badge>
+                    </div>
+                  )}
+                  <div style={{ aspectRatio: "16/10" }}>
+                    <img src={card.imagem_url} alt={card.titulo} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                  </div>
+                  <div className="p-3 space-y-1">
+                    <p className="text-[10px] text-primary font-semibold">Vídeo {index + 1}</p>
+                    <p className="text-foreground text-xs sm:text-sm font-bold leading-tight line-clamp-2">{card.titulo}</p>
+                    {card.descricao && <p className="text-muted-foreground text-[10px] sm:text-xs line-clamp-2">{card.descricao}</p>}
+                  </div>
+                </Card>
+              </button>
+            ))}
+          </div>
+          {conteudoCards.length > 4 && (
+            <div className="flex justify-center">
+              <Button variant="outline" onClick={() => setShowAllConteudo(!showAllConteudo)}>
+                {showAllConteudo ? "Ver menos" : "VER TUDO!"}
+              </Button>
+            </div>
+          )}
+        </section>
+      )}
               <button key={card.id} onClick={() => openCard(card)} className="group block text-left w-full">
                 <Card className="overflow-hidden border-border hover:border-primary/50 transition-all duration-300 hover:-translate-y-1 relative">
                   {progresso[card.id] && (
