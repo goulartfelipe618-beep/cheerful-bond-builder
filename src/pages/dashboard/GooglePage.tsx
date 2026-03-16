@@ -162,52 +162,7 @@ export default function GooglePage() {
     setCreateOpen(false);
   };
 
-  // Active service view
-  if (servicoAtivo?.status === "concluido") {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            <CheckCircle2 className="h-6 w-6 text-primary" /> Google Business — Serviço Ativo
-          </h1>
-          <Button onClick={() => setManageOpen(true)}>
-            <Edit className="h-4 w-4 mr-2" /> Gerenciar Perfil
-          </Button>
-        </div>
-
-        <div className="rounded-xl border border-primary/30 bg-card p-6 space-y-4">
-          {servicoAtivo.link_acesso && (
-            <div className="space-y-1">
-              <p className="text-sm text-muted-foreground">Link de Acesso</p>
-              <a href={servicoAtivo.link_acesso} target="_blank" rel="noopener noreferrer" className="text-primary font-medium flex items-center gap-1 hover:underline">
-                <ExternalLink className="h-4 w-4" /> {servicoAtivo.link_acesso}
-              </a>
-            </div>
-          )}
-          {servicoAtivo.data_expiracao && (
-            <div className="space-y-1">
-              <p className="text-sm text-muted-foreground">Válido até</p>
-              <p className="text-foreground font-medium flex items-center gap-1"><Calendar className="h-4 w-4" /> {new Date(servicoAtivo.data_expiracao).toLocaleDateString("pt-BR")}</p>
-            </div>
-          )}
-          {servicoAtivo.instrucoes_acesso && (
-            <div className="space-y-1">
-              <p className="text-sm text-muted-foreground">Instruções</p>
-              <p className="text-foreground whitespace-pre-wrap">{servicoAtivo.instrucoes_acesso}</p>
-            </div>
-          )}
-          {servicoAtivo.como_usar && (
-            <div className="space-y-1">
-              <p className="text-sm text-muted-foreground">Como Usar</p>
-              <p className="text-foreground whitespace-pre-wrap">{servicoAtivo.como_usar}</p>
-            </div>
-          )}
-        </div>
-
-        {renderManagementDialog()}
-      </div>
-    );
-  }
+  const hasProfile = !!servicoAtivo;
 
   const pendingBanner = servicoAtivo && (servicoAtivo.status === "pendente" || servicoAtivo.status === "em_andamento") ? (
     <div className="rounded-xl border border-yellow-500/30 bg-yellow-500/10 p-4 flex items-center gap-3">
@@ -216,6 +171,41 @@ export default function GooglePage() {
         <p className="text-sm font-semibold text-foreground">Solicitação Google Business em análise</p>
         <p className="text-xs text-muted-foreground">Status: <Badge variant="outline">{servicoAtivo.status === "pendente" ? "Pendente" : "Em andamento"}</Badge></p>
       </div>
+    </div>
+  ) : null;
+
+  const activeBanner = servicoAtivo?.status === "concluido" ? (
+    <div className="rounded-xl border border-primary/30 bg-card p-6 space-y-4">
+      <div className="flex items-center gap-2">
+        <CheckCircle2 className="h-5 w-5 text-primary" />
+        <h2 className="text-lg font-bold text-foreground">Perfil Google Business — Ativo</h2>
+      </div>
+      {servicoAtivo.link_acesso && (
+        <div className="space-y-1">
+          <p className="text-sm text-muted-foreground">Link de Acesso</p>
+          <a href={servicoAtivo.link_acesso} target="_blank" rel="noopener noreferrer" className="text-primary font-medium flex items-center gap-1 hover:underline">
+            <ExternalLink className="h-4 w-4" /> {servicoAtivo.link_acesso}
+          </a>
+        </div>
+      )}
+      {servicoAtivo.data_expiracao && (
+        <div className="space-y-1">
+          <p className="text-sm text-muted-foreground">Válido até</p>
+          <p className="text-foreground font-medium flex items-center gap-1"><Calendar className="h-4 w-4" /> {new Date(servicoAtivo.data_expiracao).toLocaleDateString("pt-BR")}</p>
+        </div>
+      )}
+      {servicoAtivo.instrucoes_acesso && (
+        <div className="space-y-1">
+          <p className="text-sm text-muted-foreground">Instruções</p>
+          <p className="text-foreground whitespace-pre-wrap">{servicoAtivo.instrucoes_acesso}</p>
+        </div>
+      )}
+      {servicoAtivo.como_usar && (
+        <div className="space-y-1">
+          <p className="text-sm text-muted-foreground">Como Usar</p>
+          <p className="text-foreground whitespace-pre-wrap">{servicoAtivo.como_usar}</p>
+        </div>
+      )}
     </div>
   ) : null;
 
