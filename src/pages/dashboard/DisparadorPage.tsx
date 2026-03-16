@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   AlertTriangle, Send, MessageSquare, ListChecks, MousePointerClick,
-  Smartphone, ShieldAlert, CheckCircle2, XCircle, Zap, ArrowRight,
+  Smartphone, ShieldAlert, XCircle, Zap,
 } from "lucide-react";
 
 const STEPS = [
