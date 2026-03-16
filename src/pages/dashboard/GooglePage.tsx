@@ -950,8 +950,8 @@ export default function GooglePage() {
               )}
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+        </div>
+      </div>
     );
   }
 
