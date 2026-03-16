@@ -1,10 +1,12 @@
-import { Mail, Globe, Search, ShoppingCart, Users, BarChart3, Car, ArrowLeftRight, Handshake, ShieldCheck, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { Mail, Globe, Search, ShoppingCart, Users, BarChart3, Car, ArrowLeftRight, Handshake, ShieldCheck, AlertTriangle, CheckCircle2, Settings, CircleDot, Check } from "lucide-react";
 import { useState, useEffect } from "react";
 import luxuryCar from "@/assets/luxury-car.jpg";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import SlideCarousel from "@/components/SlideCarousel";
+import { useActivePage } from "@/contexts/ActivePageContext";
+import { Progress } from "@/components/ui/progress";
 
 const tools = [
   { icon: Mail, title: "E-mail Profissional", desc: "Crie e-mails corporativos com o domínio da sua empresa para credibilidade total." },
@@ -19,8 +21,34 @@ const tools = [
 ];
 
 export default function HomePage() {
+  const { setActivePage } = useActivePage();
   const [networkAceito, setNetworkAceito] = useState<boolean | null>(null);
   const [mostrarRegras, setMostrarRegras] = useState(false);
+  const [configCompleta, setConfigCompleta] = useState<boolean | null>(null);
+
+  const CAMPOS_OBRIGATORIOS = ["nome_completo", "nome_empresa", "cnpj", "telefone", "email", "endereco_completo", "cidade", "estado"];
+
+  useEffect(() => {
+    const checkConfig = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data } = await supabase
+        .from("configuracoes" as any)
+        .select("*")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (!data) {
+        setConfigCompleta(false);
+        return;
+      }
+      const d = data as any;
+      const allFilled = CAMPOS_OBRIGATORIOS.every(
+        (campo) => d[campo] && String(d[campo]).trim() !== ""
+      );
+      setConfigCompleta(allFilled);
+    };
+    checkConfig();
+  }, []);
 
   useEffect(() => {
     const checkNetworkStatus = () => {
@@ -74,7 +102,37 @@ export default function HomePage() {
         }]}
       />
 
-      {/* Network Nacional - Termo */}
+      {/* Primeiros Passos */}
+      {configCompleta === false && (
+        <div className="rounded-xl border-2 border-amber-500/50 bg-card p-6 space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="p-3 rounded-xl bg-amber-500/10">
+              <Settings className="h-6 w-6 text-amber-500" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-foreground">Primeiros Passos</h3>
+              <p className="text-sm text-muted-foreground">Complete as etapas abaixo para começar a usar a plataforma</p>
+            </div>
+          </div>
+          <div className="space-y-3">
+            <div
+              className="flex items-center gap-3 p-3 rounded-lg border border-amber-500/30 bg-amber-500/5 cursor-pointer hover:bg-amber-500/10 transition-colors"
+              onClick={() => setActivePage("sistema_configuracoes")}
+            >
+              <div className="p-1.5 rounded-full border-2 border-amber-500">
+                <CircleDot className="h-4 w-4 text-amber-500" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-foreground">Preencha suas Configurações</p>
+                <p className="text-xs text-muted-foreground">Acesse Sistema → Configurações e preencha todos os campos obrigatórios (nome, empresa, CNPJ, telefone, e-mail, endereço, cidade e estado).</p>
+              </div>
+              <Badge variant="outline" className="text-amber-500 border-amber-500/50">Pendente</Badge>
+            </div>
+          </div>
+        </div>
+      )}
+
+
       {networkAceito === null && !mostrarRegras && (
         <div className="rounded-xl border-2 border-primary/50 bg-card p-6 space-y-4">
           <div className="flex items-center gap-3">
