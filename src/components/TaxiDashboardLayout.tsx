@@ -1,4 +1,5 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import PageLoader from "@/components/PageLoader";
 import { TaxiSidebar } from "@/components/TaxiSidebar";
 import { Car } from "lucide-react";
 import { ActivePageProvider, useActivePage } from "@/contexts/ActivePageContext";
