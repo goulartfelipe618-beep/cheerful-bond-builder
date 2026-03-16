@@ -214,7 +214,7 @@ export default function MentoriaPage() {
                       </Badge>
                     </div>
                   )}
-                  <div style={{ aspectRatio: "16/10" }}>
+                  <div style={{ aspectRatio: "1080/1350" }}>
                     <img src={card.imagem_url} alt={card.titulo} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                   </div>
                   <div className="p-3 space-y-1">
