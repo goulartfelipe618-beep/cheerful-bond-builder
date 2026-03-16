@@ -51,7 +51,6 @@ const MANAGEMENT_TABS = [
 
 export default function GooglePage() {
   const [createOpen, setCreateOpen] = useState(false);
-  const [manageOpen, setManageOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("info");
   const [submitting, setSubmitting] = useState(false);
   const [servicoAtivo, setServicoAtivo] = useState<any>(null);
@@ -163,52 +162,7 @@ export default function GooglePage() {
     setCreateOpen(false);
   };
 
-  // Active service view
-  if (servicoAtivo?.status === "concluido") {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            <CheckCircle2 className="h-6 w-6 text-primary" /> Google Business — Serviço Ativo
-          </h1>
-          <Button onClick={() => setManageOpen(true)}>
-            <Edit className="h-4 w-4 mr-2" /> Gerenciar Perfil
-          </Button>
-        </div>
-
-        <div className="rounded-xl border border-primary/30 bg-card p-6 space-y-4">
-          {servicoAtivo.link_acesso && (
-            <div className="space-y-1">
-              <p className="text-sm text-muted-foreground">Link de Acesso</p>
-              <a href={servicoAtivo.link_acesso} target="_blank" rel="noopener noreferrer" className="text-primary font-medium flex items-center gap-1 hover:underline">
-                <ExternalLink className="h-4 w-4" /> {servicoAtivo.link_acesso}
-              </a>
-            </div>
-          )}
-          {servicoAtivo.data_expiracao && (
-            <div className="space-y-1">
-              <p className="text-sm text-muted-foreground">Válido até</p>
-              <p className="text-foreground font-medium flex items-center gap-1"><Calendar className="h-4 w-4" /> {new Date(servicoAtivo.data_expiracao).toLocaleDateString("pt-BR")}</p>
-            </div>
-          )}
-          {servicoAtivo.instrucoes_acesso && (
-            <div className="space-y-1">
-              <p className="text-sm text-muted-foreground">Instruções</p>
-              <p className="text-foreground whitespace-pre-wrap">{servicoAtivo.instrucoes_acesso}</p>
-            </div>
-          )}
-          {servicoAtivo.como_usar && (
-            <div className="space-y-1">
-              <p className="text-sm text-muted-foreground">Como Usar</p>
-              <p className="text-foreground whitespace-pre-wrap">{servicoAtivo.como_usar}</p>
-            </div>
-          )}
-        </div>
-
-        {renderManagementDialog()}
-      </div>
-    );
-  }
+  const hasProfile = !!servicoAtivo;
 
   const pendingBanner = servicoAtivo && (servicoAtivo.status === "pendente" || servicoAtivo.status === "em_andamento") ? (
     <div className="rounded-xl border border-yellow-500/30 bg-yellow-500/10 p-4 flex items-center gap-3">
@@ -220,14 +174,47 @@ export default function GooglePage() {
     </div>
   ) : null;
 
-  // === MANAGEMENT DIALOG ===
-  function renderManagementDialog() {
+  const activeBanner = servicoAtivo?.status === "concluido" ? (
+    <div className="rounded-xl border border-primary/30 bg-card p-6 space-y-4">
+      <div className="flex items-center gap-2">
+        <CheckCircle2 className="h-5 w-5 text-primary" />
+        <h2 className="text-lg font-bold text-foreground">Perfil Google Business — Ativo</h2>
+      </div>
+      {servicoAtivo.link_acesso && (
+        <div className="space-y-1">
+          <p className="text-sm text-muted-foreground">Link de Acesso</p>
+          <a href={servicoAtivo.link_acesso} target="_blank" rel="noopener noreferrer" className="text-primary font-medium flex items-center gap-1 hover:underline">
+            <ExternalLink className="h-4 w-4" /> {servicoAtivo.link_acesso}
+          </a>
+        </div>
+      )}
+      {servicoAtivo.data_expiracao && (
+        <div className="space-y-1">
+          <p className="text-sm text-muted-foreground">Válido até</p>
+          <p className="text-foreground font-medium flex items-center gap-1"><Calendar className="h-4 w-4" /> {new Date(servicoAtivo.data_expiracao).toLocaleDateString("pt-BR")}</p>
+        </div>
+      )}
+      {servicoAtivo.instrucoes_acesso && (
+        <div className="space-y-1">
+          <p className="text-sm text-muted-foreground">Instruções</p>
+          <p className="text-foreground whitespace-pre-wrap">{servicoAtivo.instrucoes_acesso}</p>
+        </div>
+      )}
+      {servicoAtivo.como_usar && (
+        <div className="space-y-1">
+          <p className="text-sm text-muted-foreground">Como Usar</p>
+          <p className="text-foreground whitespace-pre-wrap">{servicoAtivo.como_usar}</p>
+        </div>
+      )}
+    </div>
+  ) : null;
+
+  // === INLINE MANAGEMENT SECTION ===
+  function renderManagementInline() {
     return (
-      <Dialog open={manageOpen} onOpenChange={setManageOpen}>
-        <DialogContent className="max-w-5xl max-h-[90vh] overflow-hidden p-0">
-          <div className="flex h-[85vh]">
-            {/* Sidebar */}
-            <div className="w-56 border-r border-border bg-muted/30 p-3 space-y-1 overflow-y-auto shrink-0">
+      <div className="flex rounded-xl border border-border overflow-hidden bg-card" style={{ minHeight: "600px" }}>
+        {/* Sidebar */}
+        <div className="w-56 border-r border-border bg-muted/30 p-3 space-y-1 overflow-y-auto shrink-0">
               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-2 mb-2">Gerenciar</p>
               {MANAGEMENT_TABS.map((tab) => {
                 const Icon = tab.icon;
@@ -963,8 +950,6 @@ export default function GooglePage() {
               )}
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
     );
   }
 
@@ -977,9 +962,35 @@ export default function GooglePage() {
     { label: "Fotos", icon: Camera },
   ];
 
+  // If profile exists, show management inline
+  if (hasProfile) {
+    return (
+      <div className="space-y-6">
+        {pendingBanner}
+        {activeBanner}
+
+        <SlideCarousel
+          pagina="google"
+          fallbackSlides={[
+            { titulo: "Coloque Sua Empresa no Google", subtitulo: "Crie seu perfil no Google Business Profile e apareça nas buscas quando clientes procurarem por transporte executivo na sua região." },
+            { titulo: "Perfil Verificado no Google", subtitulo: "Motoristas com perfil verificado passam mais confiança. Hotéis e empresas encontram você diretamente no Google Maps." },
+            { titulo: "Aumente Sua Visibilidade", subtitulo: "Destaque-se nos resultados de busca com avaliações positivas e informações completas do seu serviço." },
+          ]}
+        />
+
+        <div>
+          <h2 className="text-xl font-bold text-foreground">Gerenciar Perfil Google Business</h2>
+          <p className="text-sm text-muted-foreground">Edite todas as informações do seu perfil no Google.</p>
+        </div>
+
+        {renderManagementInline()}
+      </div>
+    );
+  }
+
+  // No profile yet — show create option
   return (
     <div className="space-y-6">
-      {pendingBanner}
       <SlideCarousel
         pagina="google"
         fallbackSlides={[
@@ -992,16 +1003,11 @@ export default function GooglePage() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-bold text-foreground">Google Business Profile</h2>
-          <p className="text-muted-foreground">Gerencie perfis para Google Meu Negócio</p>
+          <p className="text-muted-foreground">Crie seu perfil no Google Meu Negócio</p>
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => setManageOpen(true)}>
-            <Settings className="h-4 w-4 mr-2" /> Gerenciar Perfil
-          </Button>
-          <Button onClick={() => { setCreateOpen(true); setCreateStep(0); }}>
-            <Plus className="h-4 w-4 mr-2" /> Novo Perfil
-          </Button>
-        </div>
+        <Button onClick={() => { setCreateOpen(true); setCreateStep(0); }}>
+          <Plus className="h-4 w-4 mr-2" /> Novo Perfil
+        </Button>
       </div>
 
       <div className="rounded-xl border border-border bg-card p-4">
@@ -1009,34 +1015,13 @@ export default function GooglePage() {
         <p className="text-sm text-muted-foreground">Preencha os dados do perfil no wizard. O sistema valida automaticamente o nome, categoria e endereço para reduzir chances de suspensão pelo Google. Motoristas sem ponto fixo devem ser configurados como "Service Area Business".</p>
       </div>
 
-      <div className="flex items-center gap-3">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input placeholder="Buscar por nome..." className="pl-9" />
-        </div>
-        <Select defaultValue="all"><SelectTrigger className="w-48"><SelectValue placeholder="Todos os status" /></SelectTrigger><SelectContent><SelectItem value="all">Todos os status</SelectItem></SelectContent></Select>
-      </div>
-
-      <div className="rounded-xl border border-border overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Nome</TableHead>
-              <TableHead>Tipo</TableHead>
-              <TableHead>Categoria</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Validado</TableHead>
-              <TableHead>Ações</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            <TableRow>
-              <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
-                Nenhum registro encontrado.
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
+      <div className="rounded-xl border border-dashed border-border p-12 text-center">
+        <Building2 className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+        <p className="text-foreground font-medium mb-1">Nenhum perfil criado</p>
+        <p className="text-sm text-muted-foreground mb-4">Crie seu perfil no Google Business para aparecer nas buscas.</p>
+        <Button onClick={() => { setCreateOpen(true); setCreateStep(0); }}>
+          <Plus className="h-4 w-4 mr-2" /> Criar Meu Perfil
+        </Button>
       </div>
 
       {/* CREATE DIALOG */}
@@ -1046,7 +1031,6 @@ export default function GooglePage() {
             <DialogTitle>Novo Perfil Google Business</DialogTitle>
           </DialogHeader>
 
-          {/* Step pills */}
           <div className="flex items-center gap-1 overflow-x-auto pb-1">
             {CREATE_STEPS.map((step, i) => {
               const Icon = step.icon;
@@ -1183,8 +1167,6 @@ export default function GooglePage() {
           </div>
         </DialogContent>
       </Dialog>
-
-      {renderManagementDialog()}
     </div>
   );
 }
