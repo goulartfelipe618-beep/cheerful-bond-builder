@@ -21,8 +21,34 @@ const tools = [
 ];
 
 export default function HomePage() {
+  const { setActivePage } = useActivePage();
   const [networkAceito, setNetworkAceito] = useState<boolean | null>(null);
   const [mostrarRegras, setMostrarRegras] = useState(false);
+  const [configCompleta, setConfigCompleta] = useState<boolean | null>(null);
+
+  const CAMPOS_OBRIGATORIOS = ["nome_completo", "nome_empresa", "cnpj", "telefone", "email", "endereco_completo", "cidade", "estado"];
+
+  useEffect(() => {
+    const checkConfig = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data } = await supabase
+        .from("configuracoes" as any)
+        .select("*")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (!data) {
+        setConfigCompleta(false);
+        return;
+      }
+      const d = data as any;
+      const allFilled = CAMPOS_OBRIGATORIOS.every(
+        (campo) => d[campo] && String(d[campo]).trim() !== ""
+      );
+      setConfigCompleta(allFilled);
+    };
+    checkConfig();
+  }, []);
 
   useEffect(() => {
     const checkNetworkStatus = () => {
