@@ -42,6 +42,10 @@ export default function EmailBusinessPage() {
   // step 1 – domain
   const [domainOption, setDomainOption] = useState<"new" | "existing">("new");
   const [domain, setDomain] = useState("");
+  const [domainChecked, setDomainChecked] = useState(false);
+  const [domainAvailable, setDomainAvailable] = useState<boolean | null>(null);
+  const [checkingDomain, setCheckingDomain] = useState(false);
+  const [domainMessage, setDomainMessage] = useState("");
 
   // step 2 – plan
   const [selectedPlan, setSelectedPlan] = useState(1);
