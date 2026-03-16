@@ -147,7 +147,7 @@ export default function AdminMentoriaPage() {
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="sobre_sistema">Sobre o Sistema (cards pequenos 1080×760)</SelectItem>
-                    <SelectItem value="conteudo">Conteúdo (cards grandes 1080×1920)</SelectItem>
+                    <SelectItem value="conteudo">Conteúdo (cards grandes 1080×1350)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -245,7 +245,7 @@ export default function AdminMentoriaPage() {
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
           {conteudoCards.map((card) => (
             <Card key={card.id} className={!card.ativo ? "opacity-50" : ""}>
-              <div className="relative" style={{ aspectRatio: "1080/1920" }}>
+              <div className="relative" style={{ aspectRatio: "1080/1350" }}>
                 <img src={card.imagem_url} alt={card.titulo} className="w-full h-full object-cover rounded-t-lg" />
                 {card.video_url && (
                   <Badge className="absolute top-2 right-2 bg-primary/90 text-primary-foreground text-[10px] gap-1">
