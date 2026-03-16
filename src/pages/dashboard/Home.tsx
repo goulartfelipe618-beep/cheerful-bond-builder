@@ -1,10 +1,12 @@
-import { Mail, Globe, Search, ShoppingCart, Users, BarChart3, Car, ArrowLeftRight, Handshake, ShieldCheck, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { Mail, Globe, Search, ShoppingCart, Users, BarChart3, Car, ArrowLeftRight, Handshake, ShieldCheck, AlertTriangle, CheckCircle2, Settings, CircleDot, Check } from "lucide-react";
 import { useState, useEffect } from "react";
 import luxuryCar from "@/assets/luxury-car.jpg";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import SlideCarousel from "@/components/SlideCarousel";
+import { useActivePage } from "@/contexts/ActivePageContext";
+import { Progress } from "@/components/ui/progress";
 
 const tools = [
   { icon: Mail, title: "E-mail Profissional", desc: "Crie e-mails corporativos com o domínio da sua empresa para credibilidade total." },
