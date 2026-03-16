@@ -504,6 +504,11 @@ export default function EmailBusinessPage() {
                   }
                   return;
                 }
+                if (step === 2) {
+                  if (!nomeCompleto.trim()) { toast.error("Preencha o nome completo."); return; }
+                  if (!nomeEmpresa.trim()) { toast.error("Preencha o nome da empresa."); return; }
+                  if (!emailPrefix.trim()) { toast.error("Preencha o nome do e-mail principal."); return; }
+                }
                 setStep((s) => s + 1);
               }}
               variant={step === 0 && !canAdvanceFromDomain() ? "outline" : "default"}
@@ -511,7 +516,13 @@ export default function EmailBusinessPage() {
               Próximo <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
           ) : (
-            <Button onClick={handleSubmitEmail} disabled={submitting}>
+            <Button onClick={() => {
+              if (!domain.trim() || !nomeCompleto.trim() || !nomeEmpresa.trim() || !emailPrefix.trim()) {
+                toast.error("Preencha todos os campos obrigatórios antes de enviar.");
+                return;
+              }
+              handleSubmitEmail();
+            }} disabled={submitting}>
               <CheckCircle2 className="h-4 w-4 mr-2" /> {submitting ? "Enviando..." : "Enviar Solicitação"}
             </Button>
           )}
