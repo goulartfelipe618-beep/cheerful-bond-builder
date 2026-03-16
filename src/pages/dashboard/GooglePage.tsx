@@ -964,9 +964,35 @@ export default function GooglePage() {
     { label: "Fotos", icon: Camera },
   ];
 
+  // If profile exists, show management inline
+  if (hasProfile) {
+    return (
+      <div className="space-y-6">
+        {pendingBanner}
+        {activeBanner}
+
+        <SlideCarousel
+          pagina="google"
+          fallbackSlides={[
+            { titulo: "Coloque Sua Empresa no Google", subtitulo: "Crie seu perfil no Google Business Profile e apareça nas buscas quando clientes procurarem por transporte executivo na sua região." },
+            { titulo: "Perfil Verificado no Google", subtitulo: "Motoristas com perfil verificado passam mais confiança. Hotéis e empresas encontram você diretamente no Google Maps." },
+            { titulo: "Aumente Sua Visibilidade", subtitulo: "Destaque-se nos resultados de busca com avaliações positivas e informações completas do seu serviço." },
+          ]}
+        />
+
+        <div>
+          <h2 className="text-xl font-bold text-foreground">Gerenciar Perfil Google Business</h2>
+          <p className="text-sm text-muted-foreground">Edite todas as informações do seu perfil no Google.</p>
+        </div>
+
+        {renderManagementInline()}
+      </div>
+    );
+  }
+
+  // No profile yet — show create option
   return (
     <div className="space-y-6">
-      {pendingBanner}
       <SlideCarousel
         pagina="google"
         fallbackSlides={[
@@ -979,16 +1005,11 @@ export default function GooglePage() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-bold text-foreground">Google Business Profile</h2>
-          <p className="text-muted-foreground">Gerencie perfis para Google Meu Negócio</p>
+          <p className="text-muted-foreground">Crie seu perfil no Google Meu Negócio</p>
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => setManageOpen(true)}>
-            <Settings className="h-4 w-4 mr-2" /> Gerenciar Perfil
-          </Button>
-          <Button onClick={() => { setCreateOpen(true); setCreateStep(0); }}>
-            <Plus className="h-4 w-4 mr-2" /> Novo Perfil
-          </Button>
-        </div>
+        <Button onClick={() => { setCreateOpen(true); setCreateStep(0); }}>
+          <Plus className="h-4 w-4 mr-2" /> Novo Perfil
+        </Button>
       </div>
 
       <div className="rounded-xl border border-border bg-card p-4">
@@ -996,34 +1017,13 @@ export default function GooglePage() {
         <p className="text-sm text-muted-foreground">Preencha os dados do perfil no wizard. O sistema valida automaticamente o nome, categoria e endereço para reduzir chances de suspensão pelo Google. Motoristas sem ponto fixo devem ser configurados como "Service Area Business".</p>
       </div>
 
-      <div className="flex items-center gap-3">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input placeholder="Buscar por nome..." className="pl-9" />
-        </div>
-        <Select defaultValue="all"><SelectTrigger className="w-48"><SelectValue placeholder="Todos os status" /></SelectTrigger><SelectContent><SelectItem value="all">Todos os status</SelectItem></SelectContent></Select>
-      </div>
-
-      <div className="rounded-xl border border-border overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Nome</TableHead>
-              <TableHead>Tipo</TableHead>
-              <TableHead>Categoria</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Validado</TableHead>
-              <TableHead>Ações</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            <TableRow>
-              <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
-                Nenhum registro encontrado.
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
+      <div className="rounded-xl border border-dashed border-border p-12 text-center">
+        <Building2 className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+        <p className="text-foreground font-medium mb-1">Nenhum perfil criado</p>
+        <p className="text-sm text-muted-foreground mb-4">Crie seu perfil no Google Business para aparecer nas buscas.</p>
+        <Button onClick={() => { setCreateOpen(true); setCreateStep(0); }}>
+          <Plus className="h-4 w-4 mr-2" /> Criar Meu Perfil
+        </Button>
       </div>
 
       {/* CREATE DIALOG */}
@@ -1033,7 +1033,6 @@ export default function GooglePage() {
             <DialogTitle>Novo Perfil Google Business</DialogTitle>
           </DialogHeader>
 
-          {/* Step pills */}
           <div className="flex items-center gap-1 overflow-x-auto pb-1">
             {CREATE_STEPS.map((step, i) => {
               const Icon = step.icon;
@@ -1170,8 +1169,6 @@ export default function GooglePage() {
           </div>
         </DialogContent>
       </Dialog>
-
-      {renderManagementDialog()}
     </div>
   );
 }
