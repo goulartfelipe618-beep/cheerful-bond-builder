@@ -103,7 +103,9 @@ function DashboardContent() {
           </div>
         </header>
         <main className="flex-1 bg-background p-6 overflow-auto">
-          <PageComponent key={activePage} />
+          <PageLoader pageKey={activePage}>
+            <PageComponent key={activePage} />
+          </PageLoader>
         </main>
       </div>
       {showOverlay && (
