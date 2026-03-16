@@ -102,6 +102,12 @@ const getMenuStructure = (showNetwork: boolean) => [
       { title: "Tickets", page: "tickets", icon: ClipboardList },
     ],
   },
+  {
+    label: "Capacitação",
+    items: [
+      { title: "Mentoria", page: "mentoria", icon: BarChart3 },
+    ],
+  },
 ];
 
 export function AppSidebar() {
