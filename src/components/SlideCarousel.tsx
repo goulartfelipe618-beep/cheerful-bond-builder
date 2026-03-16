@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -42,38 +42,73 @@ export default function SlideCarousel({ pagina, fallbackSlides }: SlideCarouselP
     ? slides
     : (fallbackSlides || []).map((s, i) => ({ id: `fallback-${i}`, ...s }));
 
-  if (loading || displaySlides.length === 0) return null;
+  const nextSlide = useCallback(() => {
+    setCurrentSlide((c) => (c < displaySlides.length - 1 ? c + 1 : 0));
+  }, [displaySlides.length]);
 
   const prevSlide = () => setCurrentSlide((c) => (c > 0 ? c - 1 : displaySlides.length - 1));
-  const nextSlide = () => setCurrentSlide((c) => (c < displaySlides.length - 1 ? c + 1 : 0));
+
+  // Auto-play every 5 seconds
+  useEffect(() => {
+    if (displaySlides.length <= 1) return;
+    const timer = setInterval(nextSlide, 5000);
+    return () => clearInterval(timer);
+  }, [nextSlide, displaySlides.length]);
+
+  if (loading || displaySlides.length === 0) return null;
+
   const currentSlideData = displaySlides[currentSlide];
-  const hasImage = !!currentSlideData?.imagem_url;
   const showText = currentSlideData?.mostrar_texto && (currentSlideData.titulo || currentSlideData.subtitulo);
   const linkUrl = currentSlideData?.link_url;
 
-  const imageElement = hasImage ? (
-    <img
-      src={displaySlides[currentSlide].imagem_url}
-      alt={displaySlides[currentSlide].titulo || "Slide"}
-      className="w-full h-auto block"
-    />
-  ) : (
-    <div className="h-72 bg-gradient-to-r from-primary/80 to-primary" />
-  );
+  const renderSlide = (slide: typeof displaySlides[0], index: number) => {
+    const isActive = index === currentSlide;
+    const hasImage = !!slide?.imagem_url;
+
+    const imageEl = hasImage ? (
+      <img
+        src={slide.imagem_url}
+        alt={slide.titulo || "Slide"}
+        className="w-full h-auto block"
+      />
+    ) : (
+      <div className="h-72 bg-gradient-to-r from-primary/80 to-primary" />
+    );
+
+    return (
+      <div
+        key={slide.id || index}
+        className="absolute inset-0 transition-opacity duration-700 ease-in-out"
+        style={{ opacity: isActive ? 1 : 0, pointerEvents: isActive ? "auto" : "none" }}
+      >
+        {linkUrl && isActive ? (
+          <a href={linkUrl} target="_blank" rel="noopener noreferrer" className="block cursor-pointer">
+            {imageEl}
+          </a>
+        ) : (
+          imageEl
+        )}
+      </div>
+    );
+  };
 
   return (
     <div className="relative rounded-xl overflow-hidden w-full">
-      {linkUrl ? (
-        <a href={linkUrl} target="_blank" rel="noopener noreferrer" className="block cursor-pointer">
-          {imageElement}
-        </a>
-      ) : (
-        imageElement
-      )}
+      {/* Container that sizes based on first image */}
+      <div className="relative">
+        {/* Invisible first image to set height */}
+        {displaySlides[0]?.imagem_url ? (
+          <img src={displaySlides[0].imagem_url} alt="" className="w-full h-auto block invisible" />
+        ) : (
+          <div className="h-72 invisible" />
+        )}
+        {/* Slides overlay */}
+        {displaySlides.map((s, i) => renderSlide(s, i))}
+      </div>
 
-      {/* Overlay com texto — só aparece se mostrar_texto estiver ativo */}
+      {/* Overlay com texto */}
       {showText && (
-        <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent flex items-center px-12">
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent flex items-center px-12 transition-opacity duration-700">
           <div className="max-w-lg">
             {currentSlideData.titulo && (
               <h2 className="text-3xl font-bold text-white mb-2">{currentSlideData.titulo}</h2>
@@ -90,13 +125,13 @@ export default function SlideCarousel({ pagina, fallbackSlides }: SlideCarouselP
         <>
           <button
             onClick={prevSlide}
-            className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 rounded-full p-2 text-white hover:bg-black/70"
+            className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 rounded-full p-2 text-white hover:bg-black/70 transition-colors"
           >
             <ChevronLeft className="h-5 w-5" />
           </button>
           <button
             onClick={nextSlide}
-            className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 rounded-full p-2 text-white hover:bg-black/70"
+            className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 rounded-full p-2 text-white hover:bg-black/70 transition-colors"
           >
             <ChevronRight className="h-5 w-5" />
           </button>
@@ -105,7 +140,7 @@ export default function SlideCarousel({ pagina, fallbackSlides }: SlideCarouselP
               <button
                 key={i}
                 onClick={() => setCurrentSlide(i)}
-                className={`h-2.5 w-2.5 rounded-full transition-colors ${i === currentSlide ? 'bg-white' : 'bg-white/40'}`}
+                className={`h-2.5 w-2.5 rounded-full transition-all duration-500 ${i === currentSlide ? 'bg-white scale-110' : 'bg-white/40'}`}
               />
             ))}
           </div>
