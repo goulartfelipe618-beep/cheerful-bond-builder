@@ -209,14 +209,12 @@ export default function GooglePage() {
     </div>
   ) : null;
 
-  // === MANAGEMENT DIALOG ===
-  function renderManagementDialog() {
+  // === INLINE MANAGEMENT SECTION ===
+  function renderManagementInline() {
     return (
-      <Dialog open={manageOpen} onOpenChange={setManageOpen}>
-        <DialogContent className="max-w-5xl max-h-[90vh] overflow-hidden p-0">
-          <div className="flex h-[85vh]">
-            {/* Sidebar */}
-            <div className="w-56 border-r border-border bg-muted/30 p-3 space-y-1 overflow-y-auto shrink-0">
+      <div className="flex rounded-xl border border-border overflow-hidden bg-card" style={{ minHeight: "600px" }}>
+        {/* Sidebar */}
+        <div className="w-56 border-r border-border bg-muted/30 p-3 space-y-1 overflow-y-auto shrink-0">
               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-2 mb-2">Gerenciar</p>
               {MANAGEMENT_TABS.map((tab) => {
                 const Icon = tab.icon;
