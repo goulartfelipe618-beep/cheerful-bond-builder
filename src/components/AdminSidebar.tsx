@@ -21,6 +21,7 @@ const simpleItems = [
   { title: "Métricas", page: "metricas", icon: BarChart3 },
   { title: "Abrangência", page: "abrangencia", icon: MapPin },
   { title: "Slides", page: "slides", icon: SlidersHorizontal },
+  { title: "Mentoria", page: "mentoria", icon: GraduationCap },
 ];
 
 const contratoChildren = [

@@ -37,6 +37,7 @@ const PAGE_MAP: Record<string, React.ComponentType> = {
   "sistema/comunicador": SistemaComunicadorPage,
   "sistema/anotacoes": AnotacoesPage,
   tickets: AdminTicketsPage,
+  mentoria: AdminMentoriaPage,
 };
 
 function AdminContent() {
