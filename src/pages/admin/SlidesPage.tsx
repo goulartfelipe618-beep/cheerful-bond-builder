@@ -28,6 +28,7 @@ const PAGINAS = [
   { value: "google", label: "Google" },
   { value: "email_business", label: "E-mail Business" },
   { value: "website", label: "Website" },
+  { value: "disparador", label: "Disparador" },
 ];
 
 export default function SlidesPage() {
