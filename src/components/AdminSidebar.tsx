@@ -2,8 +2,7 @@ import {
   Home, SlidersHorizontal, LogOut, Shield, BarChart3, MapPin, FileText, ChevronDown, Users, ClipboardList, Building2, LayoutTemplate, Bell, Moon, Sun, Settings, StickyNote, MessageSquare, Zap,
 } from "lucide-react";
 import { useState, useEffect } from "react";
-import { NavLink } from "@/components/NavLink";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
@@ -15,40 +14,37 @@ import {
   Collapsible, CollapsibleContent, CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
+import { useActivePage } from "@/contexts/ActivePageContext";
 
 const simpleItems = [
-  { title: "Home", url: "/admin", icon: Home },
-  { title: "Métricas", url: "/admin/metricas", icon: BarChart3 },
-  { title: "Abrangência", url: "/admin/abrangencia", icon: MapPin },
-  { title: "Slides", url: "/admin/slides", icon: SlidersHorizontal },
+  { title: "Home", page: "home", icon: Home },
+  { title: "Métricas", page: "metricas", icon: BarChart3 },
+  { title: "Abrangência", page: "abrangencia", icon: MapPin },
+  { title: "Slides", page: "slides", icon: SlidersHorizontal },
 ];
 
 const contratoChildren = [
-  { title: "Transfer", url: "/admin/contrato/transfer", icon: FileText },
-  { title: "Táxi", url: "/admin/contrato/taxi", icon: FileText },
+  { title: "Transfer", page: "contrato/transfer", icon: FileText },
+  { title: "Táxi", page: "contrato/taxi", icon: FileText },
 ];
 
 const usuariosChildren = [
-  { title: "Cadastrados", url: "/admin/usuarios/cadastrados", icon: Users },
-  { title: "Solicitações", url: "/admin/usuarios/solicitacoes", icon: ClipboardList },
+  { title: "Cadastrados", page: "usuarios/cadastrados", icon: Users },
+  { title: "Solicitações", page: "usuarios/solicitacoes", icon: ClipboardList },
 ];
 
-const networkItem = { title: "Network", url: "/admin/network", icon: Building2 };
-const solicitacoesItem = { title: "Solicitações Serviços", url: "/admin/solicitacoes-servicos", icon: ClipboardList };
-const templatesItem = { title: "Templates", url: "/admin/templates", icon: LayoutTemplate };
-
 const sistemaChildren = [
-  { title: "Configurações", url: "/admin/sistema/configuracoes", icon: Settings },
-  { title: "Automações", url: "/admin/sistema/automacoes", icon: Zap },
-  { title: "Comunicador", url: "/admin/sistema/comunicador", icon: MessageSquare },
-  { title: "Anotações", url: "/admin/sistema/anotacoes", icon: StickyNote },
+  { title: "Configurações", page: "sistema/configuracoes", icon: Settings },
+  { title: "Automações", page: "sistema/automacoes", icon: Zap },
+  { title: "Comunicador", page: "sistema/comunicador", icon: MessageSquare },
+  { title: "Anotações", page: "sistema/anotacoes", icon: StickyNote },
 ];
 
 export function AdminSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
-  const location = useLocation();
   const navigate = useNavigate();
+  const { activePage, setActivePage } = useActivePage();
 
   const [darkMode, setDarkMode] = useState(() => document.documentElement.classList.contains("dark"));
 
@@ -60,15 +56,49 @@ export function AdminSidebar() {
     }
   }, [darkMode]);
 
-  const isActive = (url: string) => location.pathname === url;
-  const contratoActive = contratoChildren.some((c) => isActive(c.url));
-  const usuariosActive = usuariosChildren.some((c) => isActive(c.url));
-  const sistemaActive = sistemaChildren.some((c) => isActive(c.url));
+  const isActive = (page: string) => activePage === page;
+  const contratoActive = contratoChildren.some((c) => isActive(c.page));
+  const usuariosActive = usuariosChildren.some((c) => isActive(c.page));
+  const sistemaActive = sistemaChildren.some((c) => isActive(c.page));
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
     navigate("/login");
   };
+
+  const renderCollapsible = (title: string, Icon: any, children: { title: string; page: string; icon: any }[], groupActive: boolean) => (
+    <Collapsible key={title} defaultOpen={groupActive}>
+      <SidebarMenuItem>
+        <CollapsibleTrigger asChild>
+          <SidebarMenuButton className={cn("w-full justify-between", groupActive && "text-primary")}>
+            <span className="flex items-center gap-2">
+              <Icon className="h-4 w-4" />
+              {!collapsed && <span>{title}</span>}
+            </span>
+            {!collapsed && <ChevronDown className="h-4 w-4 transition-transform group-data-[state=open]:rotate-180" />}
+          </SidebarMenuButton>
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <SidebarMenuSub>
+            {children.map((child) => (
+              <SidebarMenuSubItem key={child.page}>
+                <SidebarMenuSubButton
+                  onClick={() => setActivePage(child.page)}
+                  className={cn(
+                    "text-sm cursor-pointer w-full",
+                    isActive(child.page) && "text-primary font-medium"
+                  )}
+                >
+                  <child.icon className="h-3.5 w-3.5 mr-2" />
+                  {child.title}
+                </SidebarMenuSubButton>
+              </SidebarMenuSubItem>
+            ))}
+          </SidebarMenuSub>
+        </CollapsibleContent>
+      </SidebarMenuItem>
+    </Collapsible>
+  );
 
   return (
     <Sidebar collapsible="icon" className="border-r border-border">
@@ -91,131 +121,54 @@ export function AdminSidebar() {
             <SidebarMenu>
               {simpleItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink to={item.url} end className="hover:bg-muted/50" activeClassName="bg-muted text-primary font-medium">
-                      <item.icon className="h-4 w-4 mr-2" />
-                      {!collapsed && <span>{item.title}</span>}
-                    </NavLink>
+                  <SidebarMenuButton
+                    onClick={() => setActivePage(item.page)}
+                    className={cn(
+                      "cursor-pointer",
+                      isActive(item.page) && "bg-muted text-primary font-medium"
+                    )}
+                  >
+                    <item.icon className="h-4 w-4 mr-2" />
+                    {!collapsed && <span>{item.title}</span>}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
 
-              {/* Contrato collapsible */}
-              <Collapsible defaultOpen={contratoActive}>
-                <SidebarMenuItem>
-                  <CollapsibleTrigger asChild>
-                    <SidebarMenuButton className={cn("w-full justify-between", contratoActive && "text-primary")}>
-                      <span className="flex items-center gap-2">
-                        <FileText className="h-4 w-4" />
-                        {!collapsed && <span>Contrato</span>}
-                      </span>
-                      {!collapsed && <ChevronDown className="h-4 w-4 transition-transform group-data-[state=open]:rotate-180" />}
-                    </SidebarMenuButton>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <SidebarMenuSub>
-                      {contratoChildren.map((child) => (
-                        <SidebarMenuSubItem key={child.url}>
-                          <SidebarMenuSubButton asChild>
-                            <NavLink to={child.url} end className="text-sm" activeClassName="text-primary font-medium">
-                              <child.icon className="h-3.5 w-3.5 mr-2" />
-                              {child.title}
-                            </NavLink>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      ))}
-                    </SidebarMenuSub>
-                  </CollapsibleContent>
-                </SidebarMenuItem>
-              </Collapsible>
+              {renderCollapsible("Contrato", FileText, contratoChildren, contratoActive)}
 
-              {/* Network */}
               <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <NavLink to={networkItem.url} end className="hover:bg-muted/50" activeClassName="bg-muted text-primary font-medium">
-                    <networkItem.icon className="h-4 w-4 mr-2" />
-                    {!collapsed && <span>{networkItem.title}</span>}
-                  </NavLink>
+                <SidebarMenuButton
+                  onClick={() => setActivePage("network")}
+                  className={cn("cursor-pointer", isActive("network") && "bg-muted text-primary font-medium")}
+                >
+                  <Building2 className="h-4 w-4 mr-2" />
+                  {!collapsed && <span>Network</span>}
                 </SidebarMenuButton>
               </SidebarMenuItem>
 
-              {/* Usuários collapsible */}
-              <Collapsible defaultOpen={usuariosActive}>
-                <SidebarMenuItem>
-                  <CollapsibleTrigger asChild>
-                    <SidebarMenuButton className={cn("w-full justify-between", usuariosActive && "text-primary")}>
-                      <span className="flex items-center gap-2">
-                        <Users className="h-4 w-4" />
-                        {!collapsed && <span>Usuários</span>}
-                      </span>
-                      {!collapsed && <ChevronDown className="h-4 w-4 transition-transform group-data-[state=open]:rotate-180" />}
-                    </SidebarMenuButton>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <SidebarMenuSub>
-                      {usuariosChildren.map((child) => (
-                        <SidebarMenuSubItem key={child.url}>
-                          <SidebarMenuSubButton asChild>
-                            <NavLink to={child.url} end className="text-sm" activeClassName="text-primary font-medium">
-                              <child.icon className="h-3.5 w-3.5 mr-2" />
-                              {child.title}
-                            </NavLink>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      ))}
-                    </SidebarMenuSub>
-                  </CollapsibleContent>
-                </SidebarMenuItem>
-              </Collapsible>
+              {renderCollapsible("Usuários", Users, usuariosChildren, usuariosActive)}
 
-              {/* Templates */}
               <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <NavLink to={templatesItem.url} end className="hover:bg-muted/50" activeClassName="bg-muted text-primary font-medium">
-                    <templatesItem.icon className="h-4 w-4 mr-2" />
-                    {!collapsed && <span>{templatesItem.title}</span>}
-                  </NavLink>
+                <SidebarMenuButton
+                  onClick={() => setActivePage("templates")}
+                  className={cn("cursor-pointer", isActive("templates") && "bg-muted text-primary font-medium")}
+                >
+                  <LayoutTemplate className="h-4 w-4 mr-2" />
+                  {!collapsed && <span>Templates</span>}
                 </SidebarMenuButton>
               </SidebarMenuItem>
 
-              {/* Solicitações Serviços */}
               <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <NavLink to={solicitacoesItem.url} end className="hover:bg-muted/50" activeClassName="bg-muted text-primary font-medium">
-                    <solicitacoesItem.icon className="h-4 w-4 mr-2" />
-                    {!collapsed && <span>{solicitacoesItem.title}</span>}
-                  </NavLink>
+                <SidebarMenuButton
+                  onClick={() => setActivePage("solicitacoes-servicos")}
+                  className={cn("cursor-pointer", isActive("solicitacoes-servicos") && "bg-muted text-primary font-medium")}
+                >
+                  <ClipboardList className="h-4 w-4 mr-2" />
+                  {!collapsed && <span>Solicitações Serviços</span>}
                 </SidebarMenuButton>
               </SidebarMenuItem>
 
-              {/* Sistema collapsible */}
-              <Collapsible defaultOpen={sistemaActive}>
-                <SidebarMenuItem>
-                  <CollapsibleTrigger asChild>
-                    <SidebarMenuButton className={cn("w-full justify-between", sistemaActive && "text-primary")}>
-                      <span className="flex items-center gap-2">
-                        <Settings className="h-4 w-4" />
-                        {!collapsed && <span>Sistema</span>}
-                      </span>
-                      {!collapsed && <ChevronDown className="h-4 w-4 transition-transform group-data-[state=open]:rotate-180" />}
-                    </SidebarMenuButton>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <SidebarMenuSub>
-                      {sistemaChildren.map((child) => (
-                        <SidebarMenuSubItem key={child.url}>
-                          <SidebarMenuSubButton asChild>
-                            <NavLink to={child.url} end className="text-sm" activeClassName="text-primary font-medium">
-                              <child.icon className="h-3.5 w-3.5 mr-2" />
-                              {child.title}
-                            </NavLink>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      ))}
-                    </SidebarMenuSub>
-                  </CollapsibleContent>
-                </SidebarMenuItem>
-              </Collapsible>
+              {renderCollapsible("Sistema", Settings, sistemaChildren, sistemaActive)}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
