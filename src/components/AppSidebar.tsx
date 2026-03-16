@@ -4,7 +4,7 @@ import {
   FileText, BookOpen, Map, Users, UserCheck, Handshake,
   ClipboardList, CalendarDays, Car, Megaphone, BarChart3,
   Globe, Search, Mail, Monitor, Settings, StickyNote,
-  Bell, Moon, LogOut,
+  Bell, Moon, LogOut, GraduationCap,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -100,6 +100,12 @@ const getMenuStructure = (showNetwork: boolean) => [
       },
       { title: "Anotações", page: "anotacoes", icon: StickyNote },
       { title: "Tickets", page: "tickets", icon: ClipboardList },
+    ],
+  },
+  {
+    label: "Capacitação",
+    items: [
+      { title: "Mentoria", page: "mentoria", icon: GraduationCap },
     ],
   },
 ];

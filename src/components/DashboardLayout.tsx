@@ -35,6 +35,7 @@ import SistemaAutomacoesPage from "@/pages/dashboard/SistemaAutomacoes";
 import SistemaComunicadorPage from "@/pages/dashboard/SistemaComunicador";
 import TicketsPage from "@/pages/dashboard/TicketsPage";
 import DisparadorPage from "@/pages/dashboard/DisparadorPage";
+import MentoriaPage from "@/pages/dashboard/MentoriaPage";
 
 const PAGE_MAP: Record<string, React.ComponentType> = {
   home: HomePage,
@@ -66,6 +67,7 @@ const PAGE_MAP: Record<string, React.ComponentType> = {
   "sistema/comunicador": SistemaComunicadorPage,
   tickets: TicketsPage,
   disparador: DisparadorPage,
+  mentoria: MentoriaPage,
 };
 
 function DashboardContent() {
