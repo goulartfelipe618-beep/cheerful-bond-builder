@@ -105,7 +105,7 @@ const getMenuStructure = (showNetwork: boolean) => [
   {
     label: "Capacitação",
     items: [
-      { title: "Mentoria", page: "mentoria", icon: BarChart3 },
+      { title: "Mentoria", page: "mentoria", icon: GraduationCap },
     ],
   },
 ];
