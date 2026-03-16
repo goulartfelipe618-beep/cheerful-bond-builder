@@ -492,7 +492,22 @@ export default function EmailBusinessPage() {
             <ArrowLeft className="h-4 w-4 mr-2" /> Voltar
           </Button>
           {step < 3 ? (
-            <Button onClick={() => setStep((s) => s + 1)}>
+            <Button
+              onClick={() => {
+                if (step === 0 && !canAdvanceFromDomain()) {
+                  if (domainOption === "new" && !domainChecked) {
+                    toast.error("Pesquise a disponibilidade do domínio antes de continuar.");
+                  } else if (domainOption === "new" && !domainAvailable) {
+                    toast.error("Domínio indisponível. Escolha outro domínio.");
+                  } else {
+                    toast.error("Informe um domínio válido.");
+                  }
+                  return;
+                }
+                setStep((s) => s + 1);
+              }}
+              variant={step === 0 && !canAdvanceFromDomain() ? "outline" : "default"}
+            >
               Próximo <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
           ) : (
