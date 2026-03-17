@@ -287,13 +287,9 @@ export default function AdminEmptyLegsPage() {
               <Label>Data/Hora do Voo</Label>
               <Input type="datetime-local" value={editForm.data_hora} onChange={(e) => setEditForm((f) => ({ ...f, data_hora: e.target.value }))} />
             </div>
-            <div>
-              <Label className="flex items-center gap-1">
-                <Clock className="h-3.5 w-3.5" /> Data/Hora de Expiração
-              </Label>
-              <Input type="datetime-local" value={editForm.data_expiracao} onChange={(e) => setEditForm((f) => ({ ...f, data_expiracao: e.target.value }))} />
-              <p className="text-xs text-muted-foreground mt-1">Após esse horário, não será possível aprovar/reprovar e ficará desativado para o motorista.</p>
-            </div>
+            <p className="text-xs text-muted-foreground bg-muted/50 p-2 rounded">
+              ⏰ A expiração é automática: quando a data/hora do voo passar, a Empty Leg será bloqueada para edição, aprovação e exclusão.
+            </p>
             <div>
               <Label>Observações</Label>
               <Textarea value={editForm.observacoes} onChange={(e) => setEditForm((f) => ({ ...f, observacoes: e.target.value }))} rows={4} />
