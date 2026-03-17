@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plane } from "lucide-react";
+import { Plane, Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import SlideCarousel from "@/components/SlideCarousel";
 import { Card, CardContent } from "@/components/ui/card";
@@ -15,7 +15,13 @@ interface EmptyLag {
   observacoes: string | null;
   status: string;
   created_at: string;
+  data_expiracao: string | null;
 }
+
+const isExpired = (item: EmptyLag) => {
+  if (!item.data_expiracao) return false;
+  return new Date(item.data_expiracao) < new Date();
+};
 
 export default function EmptyLegsPage() {
   const [items, setItems] = useState<EmptyLag[]>([]);
@@ -69,30 +75,48 @@ export default function EmptyLegsPage() {
         </Card>
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
-          {items.map((item) => (
-            <Card key={item.id} className="border-border hover:shadow-md transition-shadow">
-              <CardContent className="p-5 space-y-3">
-                <div className="flex items-center justify-between">
-                  <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/30">
-                    ✈️ Disponível
-                  </Badge>
-                  <span className="text-xs text-muted-foreground">{formatDate(item.created_at)}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Plane className="h-4 w-4 text-primary" />
-                  <span className="font-semibold text-foreground">{item.origem || "—"}</span>
-                  <span className="text-muted-foreground">→</span>
-                  <span className="font-semibold text-foreground">{item.destino || "—"}</span>
-                </div>
-                {item.data_hora && (
-                  <p className="text-sm text-muted-foreground">📅 {formatDate(item.data_hora)}</p>
-                )}
-                {item.observacoes && (
-                  <p className="text-sm text-muted-foreground">📝 {item.observacoes}</p>
-                )}
-              </CardContent>
-            </Card>
-          ))}
+          {items.map((item) => {
+            const expired = isExpired(item);
+            return (
+              <Card
+                key={item.id}
+                className={`border-border transition-all ${expired ? "opacity-40 grayscale pointer-events-none select-none" : "hover:shadow-md"}`}
+              >
+                <CardContent className="p-5 space-y-3">
+                  <div className="flex items-center justify-between">
+                    {expired ? (
+                      <Badge variant="outline" className="bg-muted text-muted-foreground border-muted-foreground/30">
+                        ⏰ Expirado
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/30">
+                        ✈️ Disponível
+                      </Badge>
+                    )}
+                    <span className="text-xs text-muted-foreground">{formatDate(item.created_at)}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Plane className="h-4 w-4 text-primary" />
+                    <span className="font-semibold text-foreground">{item.origem || "—"}</span>
+                    <span className="text-muted-foreground">→</span>
+                    <span className="font-semibold text-foreground">{item.destino || "—"}</span>
+                  </div>
+                  {item.data_hora && (
+                    <p className="text-sm text-muted-foreground">📅 {formatDate(item.data_hora)}</p>
+                  )}
+                  {item.observacoes && (
+                    <p className="text-sm text-muted-foreground">📝 {item.observacoes}</p>
+                  )}
+                  {item.data_expiracao && (
+                    <p className={`text-xs flex items-center gap-1 ${expired ? "text-destructive" : "text-muted-foreground"}`}>
+                      <Clock className="h-3 w-3" />
+                      {expired ? "Oferta expirada" : `Válido até ${formatDate(item.data_expiracao)}`}
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       )}
 
