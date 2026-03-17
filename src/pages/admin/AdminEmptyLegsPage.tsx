@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { Plane, Check, X, Pencil, Eye, Filter } from "lucide-react";
+import { Plane, Check, X, Pencil, Eye, Filter, Trash2, Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -23,7 +24,13 @@ interface EmptyLag {
   editado_por: string | null;
   created_at: string;
   updated_at: string;
+  data_expiracao: string | null;
 }
+
+const isExpired = (item: EmptyLag) => {
+  if (!item.data_expiracao) return false;
+  return new Date(item.data_expiracao) < new Date();
+};
 
 export default function AdminEmptyLegsPage() {
   const [items, setItems] = useState<EmptyLag[]>([]);
@@ -31,7 +38,8 @@ export default function AdminEmptyLegsPage() {
   const [filtroStatus, setFiltroStatus] = useState("todos");
   const [detalhesItem, setDetalhesItem] = useState<EmptyLag | null>(null);
   const [editItem, setEditItem] = useState<EmptyLag | null>(null);
-  const [editForm, setEditForm] = useState({ origem: "", destino: "", data_hora: "", observacoes: "" });
+  const [editForm, setEditForm] = useState({ origem: "", destino: "", data_hora: "", observacoes: "", data_expiracao: "" });
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const fetchItems = async () => {
     let query = supabase.from("empty_lags").select("*").order("created_at", { ascending: false });
@@ -66,6 +74,18 @@ export default function AdminEmptyLegsPage() {
     }
   };
 
+  const handleDelete = async () => {
+    if (!deleteId) return;
+    const { error } = await supabase.from("empty_lags").delete().eq("id", deleteId);
+    if (error) {
+      toast.error("Erro ao excluir");
+    } else {
+      toast.success("Empty Leg excluída!");
+      fetchItems();
+    }
+    setDeleteId(null);
+  };
+
   const openEdit = (item: EmptyLag) => {
     setEditItem(item);
     setEditForm({
@@ -73,6 +93,7 @@ export default function AdminEmptyLegsPage() {
       destino: item.destino,
       data_hora: item.data_hora ? item.data_hora.slice(0, 16) : "",
       observacoes: item.observacoes || "",
+      data_expiracao: item.data_expiracao ? item.data_expiracao.slice(0, 16) : "",
     });
   };
 
@@ -84,6 +105,7 @@ export default function AdminEmptyLegsPage() {
       destino: editForm.destino,
       data_hora: editForm.data_hora || null,
       observacoes: editForm.observacoes,
+      data_expiracao: editForm.data_expiracao || null,
       editado_por: user?.email || "admin",
       updated_at: new Date().toISOString(),
     }).eq("id", editItem.id);
@@ -96,7 +118,10 @@ export default function AdminEmptyLegsPage() {
     }
   };
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (status: string, expired: boolean) => {
+    if (expired) {
+      return <Badge variant="outline" className="bg-muted text-muted-foreground border-muted-foreground/30">⏰ Expirado</Badge>;
+    }
     switch (status) {
       case "pendente":
         return <Badge variant="outline" className="bg-yellow-500/10 text-yellow-500 border-yellow-500/30">🟡 Pendente</Badge>;
@@ -154,52 +179,68 @@ export default function AdminEmptyLegsPage() {
         </Card>
       ) : (
         <div className="grid gap-4">
-          {items.map((item) => (
-            <Card key={item.id} className="border-border">
-              <CardContent className="p-5">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  <div className="space-y-1 flex-1">
-                    <div className="flex items-center gap-3 flex-wrap">
-                      {getStatusBadge(item.status)}
-                      <span className="text-xs text-muted-foreground">
-                        Recebido em {formatDate(item.created_at)}
-                      </span>
+          {items.map((item) => {
+            const expired = isExpired(item);
+            return (
+              <Card key={item.id} className={`border-border ${expired ? "opacity-60" : ""}`}>
+                <CardContent className="p-5">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="space-y-1 flex-1">
+                      <div className="flex items-center gap-3 flex-wrap">
+                        {getStatusBadge(item.status, expired)}
+                        <span className="text-xs text-muted-foreground">
+                          Recebido em {formatDate(item.created_at)}
+                        </span>
+                        {item.data_expiracao && (
+                          <span className={`text-xs flex items-center gap-1 ${expired ? "text-destructive" : "text-muted-foreground"}`}>
+                            <Clock className="h-3 w-3" />
+                            Expira: {formatDate(item.data_expiracao)}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 mt-2">
+                        <Plane className="h-4 w-4 text-primary" />
+                        <span className="font-semibold text-foreground">{item.origem || "—"}</span>
+                        <span className="text-muted-foreground">→</span>
+                        <span className="font-semibold text-foreground">{item.destino || "—"}</span>
+                      </div>
+                      {item.data_hora && (
+                        <p className="text-sm text-muted-foreground">📅 {formatDate(item.data_hora)}</p>
+                      )}
+                      {item.observacoes && (
+                        <p className="text-sm text-muted-foreground line-clamp-2">📝 {item.observacoes}</p>
+                      )}
                     </div>
-                    <div className="flex items-center gap-2 mt-2">
-                      <Plane className="h-4 w-4 text-primary" />
-                      <span className="font-semibold text-foreground">{item.origem || "—"}</span>
-                      <span className="text-muted-foreground">→</span>
-                      <span className="font-semibold text-foreground">{item.destino || "—"}</span>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <Button variant="outline" size="sm" onClick={() => setDetalhesItem(item)}>
+                        <Eye className="h-4 w-4 mr-1" /> Detalhes
+                      </Button>
+                      {!expired && (
+                        <>
+                          <Button variant="outline" size="sm" onClick={() => openEdit(item)}>
+                            <Pencil className="h-4 w-4 mr-1" /> Editar
+                          </Button>
+                          {item.status !== "aprovado" && (
+                            <Button size="sm" className="bg-green-600 hover:bg-green-700" onClick={() => updateStatus(item.id, "aprovado")}>
+                              <Check className="h-4 w-4 mr-1" /> Aprovar
+                            </Button>
+                          )}
+                          {item.status !== "reprovado" && (
+                            <Button size="sm" variant="destructive" onClick={() => updateStatus(item.id, "reprovado")}>
+                              <X className="h-4 w-4 mr-1" /> Reprovar
+                            </Button>
+                          )}
+                        </>
+                      )}
+                      <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive" onClick={() => setDeleteId(item.id)}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                     </div>
-                    {item.data_hora && (
-                      <p className="text-sm text-muted-foreground">📅 {formatDate(item.data_hora)}</p>
-                    )}
-                    {item.observacoes && (
-                      <p className="text-sm text-muted-foreground line-clamp-2">📝 {item.observacoes}</p>
-                    )}
                   </div>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <Button variant="outline" size="sm" onClick={() => setDetalhesItem(item)}>
-                      <Eye className="h-4 w-4 mr-1" /> Detalhes
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={() => openEdit(item)}>
-                      <Pencil className="h-4 w-4 mr-1" /> Editar
-                    </Button>
-                    {item.status !== "aprovado" && (
-                      <Button size="sm" className="bg-green-600 hover:bg-green-700" onClick={() => updateStatus(item.id, "aprovado")}>
-                        <Check className="h-4 w-4 mr-1" /> Aprovar
-                      </Button>
-                    )}
-                    {item.status !== "reprovado" && (
-                      <Button size="sm" variant="destructive" onClick={() => updateStatus(item.id, "reprovado")}>
-                        <X className="h-4 w-4 mr-1" /> Reprovar
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       )}
 
@@ -211,11 +252,12 @@ export default function AdminEmptyLegsPage() {
           </DialogHeader>
           {detalhesItem && (
             <div className="space-y-3 text-sm">
-              <div><strong>Status:</strong> {getStatusBadge(detalhesItem.status)}</div>
+              <div><strong>Status:</strong> {getStatusBadge(detalhesItem.status, isExpired(detalhesItem))}</div>
               <div><strong>Origem:</strong> {detalhesItem.origem || "—"}</div>
               <div><strong>Destino:</strong> {detalhesItem.destino || "—"}</div>
               <div><strong>Data/Hora:</strong> {formatDate(detalhesItem.data_hora)}</div>
               <div><strong>Observações:</strong> {detalhesItem.observacoes || "—"}</div>
+              <div><strong>Expiração:</strong> {detalhesItem.data_expiracao ? formatDate(detalhesItem.data_expiracao) : "Sem expiração"}</div>
               <div><strong>Editado por:</strong> {detalhesItem.editado_por || "—"}</div>
               <div><strong>Recebido em:</strong> {formatDate(detalhesItem.created_at)}</div>
               <div><strong>Atualizado em:</strong> {formatDate(detalhesItem.updated_at)}</div>
@@ -240,8 +282,15 @@ export default function AdminEmptyLegsPage() {
               <Input value={editForm.destino} onChange={(e) => setEditForm((f) => ({ ...f, destino: e.target.value }))} />
             </div>
             <div>
-              <Label>Data/Hora</Label>
+              <Label>Data/Hora do Voo</Label>
               <Input type="datetime-local" value={editForm.data_hora} onChange={(e) => setEditForm((f) => ({ ...f, data_hora: e.target.value }))} />
+            </div>
+            <div>
+              <Label className="flex items-center gap-1">
+                <Clock className="h-3.5 w-3.5" /> Data/Hora de Expiração
+              </Label>
+              <Input type="datetime-local" value={editForm.data_expiracao} onChange={(e) => setEditForm((f) => ({ ...f, data_expiracao: e.target.value }))} />
+              <p className="text-xs text-muted-foreground mt-1">Após esse horário, não será possível aprovar/reprovar e ficará desativado para o motorista.</p>
             </div>
             <div>
               <Label>Observações</Label>
@@ -251,6 +300,24 @@ export default function AdminEmptyLegsPage() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Confirmação de Exclusão */}
+      <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir Empty Leg?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação não pode ser desfeita. A Empty Leg será removida permanentemente.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
