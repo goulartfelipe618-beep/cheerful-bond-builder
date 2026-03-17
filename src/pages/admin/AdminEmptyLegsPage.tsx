@@ -93,7 +93,6 @@ export default function AdminEmptyLegsPage() {
       destino: item.destino,
       data_hora: item.data_hora ? item.data_hora.slice(0, 16) : "",
       observacoes: item.observacoes || "",
-      data_expiracao: item.data_expiracao ? item.data_expiracao.slice(0, 16) : "",
     });
   };
 
