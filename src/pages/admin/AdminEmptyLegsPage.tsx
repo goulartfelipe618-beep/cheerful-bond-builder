@@ -28,8 +28,8 @@ interface EmptyLag {
 }
 
 const isExpired = (item: EmptyLag) => {
-  if (!item.data_expiracao) return false;
-  return new Date(item.data_expiracao) < new Date();
+  if (!item.data_hora) return false;
+  return new Date(item.data_hora) < new Date();
 };
 
 export default function AdminEmptyLegsPage() {
@@ -38,7 +38,7 @@ export default function AdminEmptyLegsPage() {
   const [filtroStatus, setFiltroStatus] = useState("todos");
   const [detalhesItem, setDetalhesItem] = useState<EmptyLag | null>(null);
   const [editItem, setEditItem] = useState<EmptyLag | null>(null);
-  const [editForm, setEditForm] = useState({ origem: "", destino: "", data_hora: "", observacoes: "", data_expiracao: "" });
+  const [editForm, setEditForm] = useState({ origem: "", destino: "", data_hora: "", observacoes: "" });
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const fetchItems = async () => {
@@ -93,19 +93,19 @@ export default function AdminEmptyLegsPage() {
       destino: item.destino,
       data_hora: item.data_hora ? item.data_hora.slice(0, 16) : "",
       observacoes: item.observacoes || "",
-      data_expiracao: item.data_expiracao ? item.data_expiracao.slice(0, 16) : "",
     });
   };
 
   const handleSaveEdit = async () => {
     if (!editItem) return;
     const { data: { user } } = await supabase.auth.getUser();
+    const dataHora = editForm.data_hora || null;
     const { error } = await supabase.from("empty_lags").update({
       origem: editForm.origem,
       destino: editForm.destino,
-      data_hora: editForm.data_hora || null,
+      data_hora: dataHora,
+      data_expiracao: dataHora,
       observacoes: editForm.observacoes,
-      data_expiracao: editForm.data_expiracao || null,
       editado_por: user?.email || "admin",
       updated_at: new Date().toISOString(),
     }).eq("id", editItem.id);
@@ -191,10 +191,10 @@ export default function AdminEmptyLegsPage() {
                         <span className="text-xs text-muted-foreground">
                           Recebido em {formatDate(item.created_at)}
                         </span>
-                        {item.data_expiracao && (
+                        {item.data_hora && (
                           <span className={`text-xs flex items-center gap-1 ${expired ? "text-destructive" : "text-muted-foreground"}`}>
                             <Clock className="h-3 w-3" />
-                            Expira: {formatDate(item.data_expiracao)}
+                            {expired ? "Expirou" : "Expira"}: {formatDate(item.data_hora)}
                           </span>
                         )}
                       </div>
@@ -232,9 +232,11 @@ export default function AdminEmptyLegsPage() {
                           )}
                         </>
                       )}
-                      <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive" onClick={() => setDeleteId(item.id)}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      {!expired && (
+                        <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive" onClick={() => setDeleteId(item.id)}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </CardContent>
@@ -257,7 +259,7 @@ export default function AdminEmptyLegsPage() {
               <div><strong>Destino:</strong> {detalhesItem.destino || "—"}</div>
               <div><strong>Data/Hora:</strong> {formatDate(detalhesItem.data_hora)}</div>
               <div><strong>Observações:</strong> {detalhesItem.observacoes || "—"}</div>
-              <div><strong>Expiração:</strong> {detalhesItem.data_expiracao ? formatDate(detalhesItem.data_expiracao) : "Sem expiração"}</div>
+              <div><strong>Expiração (data do voo):</strong> {detalhesItem.data_hora ? formatDate(detalhesItem.data_hora) : "Sem data"}</div>
               <div><strong>Editado por:</strong> {detalhesItem.editado_por || "—"}</div>
               <div><strong>Recebido em:</strong> {formatDate(detalhesItem.created_at)}</div>
               <div><strong>Atualizado em:</strong> {formatDate(detalhesItem.updated_at)}</div>
@@ -285,13 +287,9 @@ export default function AdminEmptyLegsPage() {
               <Label>Data/Hora do Voo</Label>
               <Input type="datetime-local" value={editForm.data_hora} onChange={(e) => setEditForm((f) => ({ ...f, data_hora: e.target.value }))} />
             </div>
-            <div>
-              <Label className="flex items-center gap-1">
-                <Clock className="h-3.5 w-3.5" /> Data/Hora de Expiração
-              </Label>
-              <Input type="datetime-local" value={editForm.data_expiracao} onChange={(e) => setEditForm((f) => ({ ...f, data_expiracao: e.target.value }))} />
-              <p className="text-xs text-muted-foreground mt-1">Após esse horário, não será possível aprovar/reprovar e ficará desativado para o motorista.</p>
-            </div>
+            <p className="text-xs text-muted-foreground bg-muted/50 p-2 rounded">
+              ⏰ A expiração é automática: quando a data/hora do voo passar, a Empty Leg será bloqueada para edição, aprovação e exclusão.
+            </p>
             <div>
               <Label>Observações</Label>
               <Textarea value={editForm.observacoes} onChange={(e) => setEditForm((f) => ({ ...f, observacoes: e.target.value }))} rows={4} />

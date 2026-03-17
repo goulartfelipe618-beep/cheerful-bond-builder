@@ -35,10 +35,12 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
+    const dataHora = body.data_hora || null;
     const { error } = await supabase.from("empty_lags").insert({
       origem: body.origem || "",
       destino: body.destino || "",
-      data_hora: body.data_hora || null,
+      data_hora: dataHora,
+      data_expiracao: dataHora,
       observacoes: body.observacoes || "",
       status: "pendente",
     });
