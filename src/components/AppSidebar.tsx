@@ -108,6 +108,12 @@ const getMenuStructure = (showNetwork: boolean) => [
       { title: "Mentoria", page: "mentoria", icon: GraduationCap },
     ],
   },
+  {
+    label: "Viagens Aéreas",
+    items: [
+      { title: "Empty Legs", page: "empty-legs", icon: Plane },
+    ],
+  },
 ];
 
 export function AppSidebar() {
