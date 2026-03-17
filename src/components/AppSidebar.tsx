@@ -4,7 +4,7 @@ import {
   FileText, BookOpen, Map, Users, UserCheck, Handshake,
   ClipboardList, CalendarDays, Car, Megaphone, BarChart3,
   Globe, Search, Mail, Monitor, Settings, StickyNote,
-  Bell, Moon, LogOut, GraduationCap,
+  Bell, Moon, LogOut, GraduationCap, Plane,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -106,6 +106,12 @@ const getMenuStructure = (showNetwork: boolean) => [
     label: "Capacitação",
     items: [
       { title: "Mentoria", page: "mentoria", icon: GraduationCap },
+    ],
+  },
+  {
+    label: "Viagens Aéreas",
+    items: [
+      { title: "Empty Legs", page: "empty-legs", icon: Plane },
     ],
   },
 ];
