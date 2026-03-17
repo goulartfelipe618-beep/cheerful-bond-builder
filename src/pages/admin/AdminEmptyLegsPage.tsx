@@ -38,7 +38,7 @@ export default function AdminEmptyLegsPage() {
   const [filtroStatus, setFiltroStatus] = useState("todos");
   const [detalhesItem, setDetalhesItem] = useState<EmptyLag | null>(null);
   const [editItem, setEditItem] = useState<EmptyLag | null>(null);
-  const [editForm, setEditForm] = useState({ origem: "", destino: "", data_hora: "", observacoes: "", data_expiracao: "" });
+  const [editForm, setEditForm] = useState({ origem: "", destino: "", data_hora: "", observacoes: "" });
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const fetchItems = async () => {
