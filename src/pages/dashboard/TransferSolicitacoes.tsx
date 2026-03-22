@@ -84,9 +84,8 @@ export default function TransferSolicitacoesPage() {
   };
 
   const handleComunicar = (s: Solicitacao) => {
-    const phone = s.contato?.replace(/\D/g, "");
-    if (phone) window.open(`https://wa.me/${phone}`, "_blank");
-    else toast.info("Contato não disponível");
+    setComunicarDados(s);
+    setComunicarOpen(true);
   };
 
   return (
