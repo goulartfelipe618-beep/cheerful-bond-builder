@@ -139,6 +139,17 @@ export default function GruposReservasPage() {
         onComunicar={handleComunicar}
         onDownload={handleDownload}
       />
+
+      {comunicarDados && (
+        <ComunicarDialog
+          open={comunicarOpen}
+          onOpenChange={setComunicarOpen}
+          dados={comunicarDados}
+          telefone={comunicarDados.whatsapp}
+          titulo="Comunicar — Reserva de Grupo"
+          onGerarPDF={() => generateGrupoPDF(comunicarDados.id)}
+        />
+      )}
     </div>
   );
 }

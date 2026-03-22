@@ -137,6 +137,17 @@ export default function TransferReservasPage() {
         onComunicar={handleComunicar}
         onDownload={handleDownload}
       />
+
+      {comunicarDados && (
+        <ComunicarDialog
+          open={comunicarOpen}
+          onOpenChange={setComunicarOpen}
+          dados={comunicarDados}
+          telefone={comunicarDados.telefone}
+          titulo="Comunicar — Reserva Transfer"
+          onGerarPDF={() => generateTransferPDF(comunicarDados.id)}
+        />
+      )}
     </div>
   );
 }
