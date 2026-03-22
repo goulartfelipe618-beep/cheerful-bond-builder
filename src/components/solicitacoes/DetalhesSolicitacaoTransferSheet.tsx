@@ -58,13 +58,13 @@ export default function DetalhesSolicitacaoTransferSheet({ solicitacao, open, on
               )}
               {isPorHora && (
                 <>
-                  <Field label="Endereço Início" value={(s as any).por_hora_endereco_inicio} />
-                  <Field label="Ponto Encerramento" value={(s as any).por_hora_ponto_encerramento} />
-                  <Field label="Data" value={formatDate((s as any).por_hora_data)} />
-                  <Field label="Hora" value={(s as any).por_hora_hora} />
-                  <Field label="Passageiros" value={(s as any).por_hora_passageiros?.toString()} />
-                  <Field label="Qtd. Horas" value={(s as any).por_hora_qtd_horas?.toString()} />
-                  <Field label="Cupom" value={(s as any).por_hora_cupom} />
+                   <Field label="Endereço Início" value={s.por_hora_endereco_inicio} />
+                   <Field label="Ponto Encerramento" value={s.por_hora_ponto_encerramento} />
+                   <Field label="Data" value={formatDate(s.por_hora_data)} />
+                   <Field label="Hora" value={s.por_hora_hora} />
+                   <Field label="Passageiros" value={s.por_hora_passageiros?.toString()} />
+                   <Field label="Qtd. Horas" value={s.por_hora_qtd_horas?.toString()} />
+                   <Field label="Cupom" value={s.por_hora_cupom} />
                 </>
               )}
             </div>
