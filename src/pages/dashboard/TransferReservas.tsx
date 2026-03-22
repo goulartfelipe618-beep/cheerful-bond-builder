@@ -45,9 +45,8 @@ export default function TransferReservasPage() {
   };
 
   const handleComunicar = (r: Reserva) => {
-    const phone = r.telefone?.replace(/\D/g, "");
-    if (phone) window.open(`https://wa.me/${phone}`, "_blank");
-    else toast.info("Telefone não disponível");
+    setComunicarDados(r);
+    setComunicarOpen(true);
   };
 
   const handleDownload = async (r: Reserva) => {
