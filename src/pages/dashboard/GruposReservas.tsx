@@ -25,6 +25,8 @@ export default function GruposReservasPage() {
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<ReservaGrupo | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [comunicarOpen, setComunicarOpen] = useState(false);
+  const [comunicarDados, setComunicarDados] = useState<ReservaGrupo | null>(null);
 
   const fetchReservas = useCallback(async () => {
     const { data, error } = await supabase
