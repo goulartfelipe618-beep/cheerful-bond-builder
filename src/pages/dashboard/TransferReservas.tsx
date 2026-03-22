@@ -8,6 +8,7 @@ import DetalhesReservaTransferSheet from "@/components/reservas/DetalhesReservaT
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { generateTransferPDF } from "@/lib/pdfGenerator";
+import ComunicarDialog from "@/components/comunicar/ComunicarDialog";
 import { Tables } from "@/integrations/supabase/types";
 
 type Reserva = Tables<"reservas_transfer">;
