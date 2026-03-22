@@ -50,10 +50,10 @@ export default function DetalhesSolicitacaoTransferSheet({ solicitacao, open, on
                 <>
                   <Field label="Embarque" value={s.embarque} />
                   <Field label="Desembarque" value={s.desembarque} />
-                  <Field label="Data" value={formatDate(s.data_viagem)} />
-                  <Field label="Hora" value={(s as any).hora_viagem} />
-                  <Field label="Passageiros" value={s.num_passageiros?.toString()} />
-                  <Field label="Cupom" value={(s as any).cupom} />
+                   <Field label="Data" value={formatDate(s.data_viagem)} />
+                   <Field label="Hora" value={s.hora_viagem} />
+                   <Field label="Passageiros" value={s.num_passageiros?.toString()} />
+                   <Field label="Cupom" value={s.cupom} />
                 </>
               )}
               {isPorHora && (
