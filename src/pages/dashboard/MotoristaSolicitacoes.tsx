@@ -7,6 +7,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import DetalhesSolicitacaoMotoristaSheet from "@/components/solicitacoes/DetalhesSolicitacaoMotoristaSheet";
 import CadastrarMotoristaDialog from "@/components/motoristas/CadastrarMotoristaDialog";
+import ComunicarDialog from "@/components/comunicar/ComunicarDialog";
+import { generateSolicitacaoMotoristaPDF } from "@/lib/pdfGenerator";
 
 interface Solicitacao {
   id: string;
