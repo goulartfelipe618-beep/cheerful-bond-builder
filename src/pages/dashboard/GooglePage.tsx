@@ -1009,7 +1009,10 @@ export default function GooglePage() {
           <h2 className="text-xl font-bold text-foreground">Google Business Profile</h2>
           <p className="text-muted-foreground">Crie seu perfil no Google Meu Negócio</p>
         </div>
-        <Button onClick={() => { setCreateOpen(true); setCreateStep(0); }}>
+        <Button onClick={() => {
+          if (!hasPlan("apex")) { setUpgradeOpen(true); return; }
+          setCreateOpen(true); setCreateStep(0);
+        }}>
           <Plus className="h-4 w-4 mr-2" /> Novo Perfil
         </Button>
       </div>
