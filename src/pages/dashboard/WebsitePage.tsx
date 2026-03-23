@@ -126,6 +126,8 @@ export default function WebsitePage() {
   const [submitting, setSubmitting] = useState(false);
   const [servicoAtivo, setServicoAtivo] = useState<any>(null);
   const [dbTemplates, setDbTemplates] = useState<TemplateDB[]>([]);
+  const { plano, hasPlan } = useUserPlan();
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
 
   // Step 1 - Domínio
   const [domain, setDomain] = useState("");
