@@ -1177,6 +1177,7 @@ export default function GooglePage() {
           </div>
         </DialogContent>
       </Dialog>
+      <UpgradePlanDialog open={upgradeOpen} onOpenChange={setUpgradeOpen} requiredPlan="apex" />
     </div>
   );
 }
