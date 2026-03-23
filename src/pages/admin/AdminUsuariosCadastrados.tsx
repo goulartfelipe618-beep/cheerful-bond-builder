@@ -6,32 +6,42 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Trash2, Users, Search, RefreshCw } from "lucide-react";
+import { Plus, Trash2, Users, Search, RefreshCw, Crown } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { PLAN_LABELS, PLAN_COLORS, PlanType } from "@/hooks/useUserPlan";
 
 interface UserItem {
   id: string;
   email: string;
   created_at: string;
   role: string;
+  plano: string;
 }
 
 const roleLabels: Record<string, string> = {
   admin_transfer: "Motorista Executivo",
   admin_taxi: "Taxista",
+  admin_master: "Administrador Master",
 };
+
+const PLANS: PlanType[] = ["free", "seed", "grow", "rise", "apex"];
 
 export default function AdminUsuariosCadastrados() {
   const [users, setUsers] = useState<UserItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [planDialogOpen, setPlanDialogOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<UserItem | null>(null);
+  const [selectedPlan, setSelectedPlan] = useState<PlanType>("free");
   const [filter, setFilter] = useState("todos");
   const [searchTerm, setSearchTerm] = useState("");
   const [formEmail, setFormEmail] = useState("");
   const [formPassword, setFormPassword] = useState("");
   const [formRole, setFormRole] = useState("");
+  const [formPlano, setFormPlano] = useState<PlanType>("free");
   const [creating, setCreating] = useState(false);
+  const [updatingPlan, setUpdatingPlan] = useState(false);
 
   const fetchUsers = async () => {
     const { data: { session } } = await supabase.auth.getSession();
@@ -47,6 +57,8 @@ export default function AdminUsuariosCadastrados() {
   };
 
   useEffect(() => { fetchUsers(); }, []);
+
+  const showPlanField = formRole === "admin_transfer" || formRole === "admin_taxi";
 
   const handleCreate = async () => {
     if (!formEmail || !formPassword || !formRole) {
@@ -65,7 +77,12 @@ export default function AdminUsuariosCadastrados() {
           Authorization: `Bearer ${session.access_token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email: formEmail, password: formPassword, role: formRole }),
+        body: JSON.stringify({
+          email: formEmail,
+          password: formPassword,
+          role: formRole,
+          plano: showPlanField ? formPlano : undefined,
+        }),
       }
     );
     const data = await res.json();
@@ -77,6 +94,7 @@ export default function AdminUsuariosCadastrados() {
       setFormEmail("");
       setFormPassword("");
       setFormRole("");
+      setFormPlano("free");
       fetchUsers();
     }
     setCreating(false);
@@ -85,7 +103,6 @@ export default function AdminUsuariosCadastrados() {
   const handleDelete = async (userId: string) => {
     if (!confirm("Tem certeza que deseja excluir este usuário? Todos os dados do painel dele serão apagados permanentemente.")) return;
     
-    // Optimistic: remove from UI immediately
     setUsers((prev) => prev.filter((u) => u.id !== userId));
     
     const { data: { session } } = await supabase.auth.getSession();
@@ -105,10 +122,44 @@ export default function AdminUsuariosCadastrados() {
     const data = await res.json();
     if (data.error) {
       toast.error(data.error);
-      fetchUsers(); // Revert on error
+      fetchUsers();
     } else {
       toast.success("Usuário e todos os dados excluídos com sucesso!");
     }
+  };
+
+  const handleOpenPlanDialog = (user: UserItem) => {
+    setSelectedUser(user);
+    setSelectedPlan((user.plano || "free") as PlanType);
+    setPlanDialogOpen(true);
+  };
+
+  const handleUpdatePlan = async () => {
+    if (!selectedUser) return;
+    setUpdatingPlan(true);
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) { setUpdatingPlan(false); return; }
+
+    const res = await fetch(
+      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-users?action=update_plan`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ user_id: selectedUser.id, plano: selectedPlan }),
+      }
+    );
+    const data = await res.json();
+    if (data.error) {
+      toast.error(data.error);
+    } else {
+      toast.success(`Plano atualizado para ${PLAN_LABELS[selectedPlan]}`);
+      setPlanDialogOpen(false);
+      fetchUsers();
+    }
+    setUpdatingPlan(false);
   };
 
   const filtered = users.filter((u) => {
@@ -156,15 +207,16 @@ export default function AdminUsuariosCadastrados() {
             <TableRow>
               <TableHead>E-mail</TableHead>
               <TableHead>Função</TableHead>
+              <TableHead>Plano</TableHead>
               <TableHead>Data de Cadastro</TableHead>
-              <TableHead className="w-20 text-right">Ações</TableHead>
+              <TableHead className="w-28 text-right">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {loading ? (
-              <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-8">Carregando...</TableCell></TableRow>
+              <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-8">Carregando...</TableCell></TableRow>
             ) : filtered.length === 0 ? (
-              <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-8">Nenhum usuário encontrado.</TableCell></TableRow>
+              <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-8">Nenhum usuário encontrado.</TableCell></TableRow>
             ) : filtered.map((u) => (
               <TableRow key={u.id}>
                 <TableCell className="font-medium text-foreground">{u.email}</TableCell>
@@ -173,10 +225,18 @@ export default function AdminUsuariosCadastrados() {
                     {roleLabels[u.role] || u.role}
                   </Badge>
                 </TableCell>
+                <TableCell>
+                  <Badge variant="outline" className={PLAN_COLORS[(u.plano || "free") as PlanType]}>
+                    {PLAN_LABELS[(u.plano || "free") as PlanType]}
+                  </Badge>
+                </TableCell>
                 <TableCell className="text-muted-foreground text-sm">
                   {new Date(u.created_at).toLocaleDateString("pt-BR")}
                 </TableCell>
-                <TableCell className="text-right">
+                <TableCell className="text-right flex items-center justify-end gap-1">
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-primary" onClick={() => handleOpenPlanDialog(u)} title="Alterar plano">
+                    <Crown className="h-4 w-4" />
+                  </Button>
                   <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDelete(u.id)}>
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -203,17 +263,64 @@ export default function AdminUsuariosCadastrados() {
               <Input type="password" placeholder="Mínimo 6 caracteres" value={formPassword} onChange={(e) => setFormPassword(e.target.value)} />
             </div>
             <div>
-              <Label>Função *</Label>
-              <Select value={formRole} onValueChange={setFormRole}>
-                <SelectTrigger><SelectValue placeholder="Selecione a função" /></SelectTrigger>
+              <Label>Tipo de Usuário *</Label>
+              <Select value={formRole} onValueChange={(v) => { setFormRole(v); if (v === "admin_master") setFormPlano("free"); }}>
+                <SelectTrigger><SelectValue placeholder="Selecione o tipo" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="admin_transfer">Motorista Executivo</SelectItem>
                   <SelectItem value="admin_taxi">Taxista</SelectItem>
+                  <SelectItem value="admin_master">Administrador Master</SelectItem>
                 </SelectContent>
               </Select>
             </div>
+            {showPlanField && (
+              <div>
+                <Label>Plano *</Label>
+                <Select value={formPlano} onValueChange={(v) => setFormPlano(v as PlanType)}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="free">FREE</SelectItem>
+                    <SelectItem value="seed">Seed</SelectItem>
+                    <SelectItem value="grow">Grow</SelectItem>
+                    <SelectItem value="rise">Rise</SelectItem>
+                    <SelectItem value="apex">Apex</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
             <Button onClick={handleCreate} disabled={creating} className="w-full">
               {creating ? "Criando..." : "Criar Usuário"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Change Plan Dialog */}
+      <Dialog open={planDialogOpen} onOpenChange={setPlanDialogOpen}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Crown className="h-5 w-5 text-primary" />
+              Alterar Plano
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Usuário: <span className="text-foreground font-medium">{selectedUser?.email}</span>
+            </p>
+            <div>
+              <Label>Novo Plano</Label>
+              <Select value={selectedPlan} onValueChange={(v) => setSelectedPlan(v as PlanType)}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {PLANS.map((p) => (
+                    <SelectItem key={p} value={p}>{PLAN_LABELS[p]}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <Button onClick={handleUpdatePlan} disabled={updatingPlan} className="w-full">
+              {updatingPlan ? "Atualizando..." : "Salvar Plano"}
             </Button>
           </div>
         </DialogContent>

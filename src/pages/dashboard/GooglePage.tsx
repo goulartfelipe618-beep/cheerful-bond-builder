@@ -22,6 +22,8 @@ import {
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useUserPlan } from "@/hooks/useUserPlan";
+import UpgradePlanDialog from "@/components/planos/UpgradePlanDialog";
 
 const DAYS = [
   { name: "Segunda-feira", short: "Seg", defaultOn: true },
@@ -50,6 +52,8 @@ const MANAGEMENT_TABS = [
 ];
 
 export default function GooglePage() {
+  const { hasPlan } = useUserPlan();
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("info");
   const [submitting, setSubmitting] = useState(false);
@@ -1005,7 +1009,10 @@ export default function GooglePage() {
           <h2 className="text-xl font-bold text-foreground">Google Business Profile</h2>
           <p className="text-muted-foreground">Crie seu perfil no Google Meu Negócio</p>
         </div>
-        <Button onClick={() => { setCreateOpen(true); setCreateStep(0); }}>
+        <Button onClick={() => {
+          if (!hasPlan("apex")) { setUpgradeOpen(true); return; }
+          setCreateOpen(true); setCreateStep(0);
+        }}>
           <Plus className="h-4 w-4 mr-2" /> Novo Perfil
         </Button>
       </div>
@@ -1019,7 +1026,10 @@ export default function GooglePage() {
         <Building2 className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
         <p className="text-foreground font-medium mb-1">Nenhum perfil criado</p>
         <p className="text-sm text-muted-foreground mb-4">Crie seu perfil no Google Business para aparecer nas buscas.</p>
-        <Button onClick={() => { setCreateOpen(true); setCreateStep(0); }}>
+        <Button onClick={() => {
+          if (!hasPlan("apex")) { setUpgradeOpen(true); return; }
+          setCreateOpen(true); setCreateStep(0);
+        }}>
           <Plus className="h-4 w-4 mr-2" /> Criar Meu Perfil
         </Button>
       </div>
@@ -1167,6 +1177,7 @@ export default function GooglePage() {
           </div>
         </DialogContent>
       </Dialog>
+      <UpgradePlanDialog open={upgradeOpen} onOpenChange={setUpgradeOpen} requiredPlan="apex" />
     </div>
   );
 }

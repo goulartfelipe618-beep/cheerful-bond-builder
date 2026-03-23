@@ -16,6 +16,8 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink, CheckCircle2, Calendar, Info } from "lucide-react";
 import SlideCarousel from "@/components/SlideCarousel";
+import { useUserPlan } from "@/hooks/useUserPlan";
+import UpgradePlanDialog from "@/components/planos/UpgradePlanDialog";
 
 interface TemplateDB {
   id: string;
@@ -124,6 +126,8 @@ export default function WebsitePage() {
   const [submitting, setSubmitting] = useState(false);
   const [servicoAtivo, setServicoAtivo] = useState<any>(null);
   const [dbTemplates, setDbTemplates] = useState<TemplateDB[]>([]);
+  const { plano, hasPlan } = useUserPlan();
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
 
   // Step 1 - Domínio
   const [domain, setDomain] = useState("");
@@ -615,6 +619,10 @@ export default function WebsitePage() {
               if (bs === 1 && !hasDomain && (!domainResult || domainResult.available !== true) && domain.trim()) {
                 toast.error("Pesquise a disponibilidade do domínio antes de continuar."); return;
               }
+              // Plan gate: after domain step, require Rise plan
+              if (bs === 1 && !hasPlan("rise")) {
+                setUpgradeOpen(true); return;
+              }
               if (bs === 2) {
                 if (!companyName.trim()) { toast.error("Preencha o nome da empresa."); return; }
                 if (!whatsapp.trim()) { toast.error("Preencha o WhatsApp."); return; }
@@ -677,6 +685,7 @@ export default function WebsitePage() {
           </Button>
         </div>
       )}
+      <UpgradePlanDialog open={upgradeOpen} onOpenChange={setUpgradeOpen} requiredPlan="rise" />
     </div>
   );
 }
